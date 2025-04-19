@@ -2,6 +2,7 @@
 
 Simple project that consists of building a web application for the Web Technologies course (2024-25).
 
+<!--
 ## Instructions
 
 1. ...
@@ -23,6 +24,7 @@ graba/
 ├─── folder/
 └─── file.ext
 ```
+-->
 
 ## Contributors
 
