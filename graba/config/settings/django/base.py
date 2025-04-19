@@ -63,7 +63,7 @@ ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
 
 
 # ======================================================== #
-# ================ Application Definition ================ #
+# ================= Application Settings ================= #
 # ======================================================== #
 
 DEFAULT_APPS = [
@@ -75,14 +75,16 @@ DEFAULT_APPS = [
     'django.contrib.staticfiles',
 ]
 
-EXTERNAL_APPS = []
+EXTERNAL_APPS = [
+    'jazzmin'
+]
 
 INTERNAL_APPS = [
     'core'
 ]
 
 INSTALLED_APPS = \
-    DEFAULT_APPS + EXTERNAL_APPS + INTERNAL_APPS
+    EXTERNAL_APPS + DEFAULT_APPS + INTERNAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -115,6 +117,18 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+
+# ======================================================== #
+# ============= External Application Settings ============ #
+# ======================================================== #
+
+JAZZMIN_SETTINGS = {
+    'site_header': 'Graboid Admin',
+    'site_brand': 'Graboid Admin Page',
+    'site_logo': 'base/images/favicon/favicon.ico',
+    'copyright': 'graba'
+}
 
 
 # ======================================================== #
