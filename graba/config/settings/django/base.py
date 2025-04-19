@@ -76,15 +76,16 @@ DEFAULT_APPS = [
 ]
 
 EXTERNAL_APPS = [
-    'jazzmin'
+    'jazzmin',
 ]
 
 INTERNAL_APPS = [
-    'core'
+    'core',
+    'auths',
 ]
 
 INSTALLED_APPS = \
-    EXTERNAL_APPS + DEFAULT_APPS + INTERNAL_APPS
+    INTERNAL_APPS + EXTERNAL_APPS + DEFAULT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -127,7 +128,7 @@ JAZZMIN_SETTINGS = {
     'site_header': 'Graboid Admin',
     'site_brand': 'Graboid Admin Page',
     'site_logo': 'base/images/favicon/favicon.ico',
-    'copyright': 'graba'
+    'copyright': 'graba',
 }
 
 
@@ -231,3 +232,10 @@ MEDIA_ROOT = DATA_DIR / 'mediafiles'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ======================================================== #
+# ==================== Authentication ==================== #
+# ======================================================== #
+
+AUTH_USER_MODEL = 'auths.User'
