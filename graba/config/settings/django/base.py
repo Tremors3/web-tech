@@ -81,7 +81,13 @@ EXTERNAL_APPS = [
 
 INTERNAL_APPS = [
     'core',
+    'accounts',
     'auths',
+    'auctions',
+    'wallet',
+    'inbox',
+    'reviews',
+    'favorites'
 ]
 
 INSTALLED_APPS = \
