@@ -1,10 +1,13 @@
 from django.db import models
-from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator, EmailValidator
-from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.core.validators import ( 
+    RegexValidator, MinValueValidator, MaxValueValidator, EmailValidator
+)
 
 
-class User(models.Model):
+class User(AbstractUser):
     EMAIL_VALIDATORS = [
         EmailValidator(
             message="Enter a valid email address."
@@ -19,14 +22,18 @@ class User(models.Model):
     LEGAL_TYPE_CHOICES = [('PRIVATE', 'Private'), ('SHOPKEEPER', 'Shopkeeper')]
 
     email = models.EmailField(unique=True, validators=EMAIL_VALIDATORS)
-    username = models.CharField(max_length=100, unique=True)
-    password_hash = models.CharField(max_length=255)
+    username = models.CharField(max_length=100)
+    bio = models.CharField(max_length=100)
+    #password_hash = models.CharField(max_length=255)
     registration_date = models.DateTimeField(default=timezone.now)
     state = models.CharField(max_length=10, choices=STATE_CHOICES, default='ACTIVE')
     legal_type = models.CharField(max_length=10, choices=LEGAL_TYPE_CHOICES)
 
     def __str__(self):
         return self.username
+    
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ['username']
     
     class Meta:
         verbose_name = "User"
