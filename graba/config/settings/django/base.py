@@ -161,6 +161,43 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # ======================================================== #
+# ==================== Custom Loggers ==================== #
+# ======================================================== #
+
+from common.utils.logger import CustomFormatter
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'colored_console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'color',
+        },
+    },
+    'formatters': {
+        'color': {
+            '()': CustomFormatter,
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['colored_console'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+        'custom': {
+            'handlers': ['colored_console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+
+# ======================================================== #
 # ======================= Database ======================= #
 # ======================================================== #
 
