@@ -47,7 +47,7 @@ class ManageDB():
     
     _models = list(reversed([
         # Accounts
-        User, Role, Seller, Buyer, Private, Shopkeeper, 
+        User, Role, Seller, Buyer, Private, Shopkeeper,
         # Auctions
         Category, Auction, Offer, WinnerOffer,
         # Favourites
@@ -101,6 +101,9 @@ class ManageDB():
             else:
                 Seller.objects.create(role=role, collection_address="Corso Italia 45")
 
+            # Aggiunga portafoglio digitale
+            Wallet.objects.create(user=user, balance_cents=randint(0, 1000 * 100))
+
         logger.info("Sample users created.")
     
     @staticmethod
@@ -124,15 +127,9 @@ class ManageDB():
         logging.info("Database built succesfully.")
 
 
-
-
-
 def run(*args):
     # runscript entry point
     ManageDB.build_db()
-
-
-
 
 
 if __name__ == '__main__':

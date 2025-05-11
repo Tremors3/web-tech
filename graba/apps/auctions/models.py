@@ -36,8 +36,8 @@ class Auction(models.Model):
     technical_details = models.TextField(blank=True, null=True)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField()
-    min_price = models.DecimalField(max_digits=10, decimal_places=2)
-    buy_now_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    min_price_cents = models.IntegerField()
+    buy_now_price_cents = models.IntegerField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='OPEN')
     
     seller = models.ForeignKey('accounts.Seller', on_delete=models.CASCADE)
@@ -68,7 +68,7 @@ class Offer(models.Model):
     offer_time = models.DateTimeField(default=timezone.now)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='ACTIVE')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount_cents = models.IntegerField()
 
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     buyer = models.ForeignKey('accounts.Buyer', on_delete=models.CASCADE)
