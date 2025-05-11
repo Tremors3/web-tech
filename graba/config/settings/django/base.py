@@ -76,6 +76,7 @@ DEFAULT_APPS = [
 ]
 
 EXTERNAL_APPS = [
+    'django_extensions',
     'jazzmin',
 ]
 
@@ -164,7 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ==================== Custom Loggers ==================== #
 # ======================================================== #
 
-from common.utils.logger import CustomFormatter
+from config.scripts.logger import CustomFormatter
 
 LOGGING = {
     'version': 1,
