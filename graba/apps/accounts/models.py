@@ -64,7 +64,7 @@ class Role(models.Model):
 
 
 class Buyer(models.Model):
-    user = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True, 
+    role = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True, 
                                 limit_choices_to={'type': 'BUYER'})
     shipping_address = models.TextField()
 
@@ -78,7 +78,7 @@ class Buyer(models.Model):
 
 
 class Seller(models.Model):
-    user = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True, 
+    role = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True, 
                                 limit_choices_to={'type': 'SELLER'})
     collection_address = models.TextField()
 
@@ -92,7 +92,7 @@ class Seller(models.Model):
 
 
 class Private(models.Model):
-    user = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, primary_key=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     fiscal_code = models.CharField(max_length=16, unique=True)
@@ -108,7 +108,7 @@ class Private(models.Model):
 
 
 class Shopkeeper(models.Model):
-    user = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, primary_key=True)
     business_name = models.CharField(max_length=100)
     iva_number = models.CharField(max_length=11, unique=True)
     headquarters_address = models.TextField()

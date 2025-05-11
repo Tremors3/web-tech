@@ -165,7 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ==================== Custom Loggers ==================== #
 # ======================================================== #
 
-from config.scripts.logger import CustomFormatter
+from scripts.logger import CustomFormatter
 
 LOGGING = {
     'version': 1,

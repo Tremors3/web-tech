@@ -1,3 +1,6 @@
+# Execute the script with:
+#     python manage.py runscript initdb
+
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 from random import choice, randint
@@ -8,27 +11,34 @@ import logging
 logger = logging.getLogger('custom')
 
 
-from apps.accounts.models import (
+# Note: The 'apps' directory has already been added to PYTHONPATH in 'settings.py'.
+# Therefore, import app modules directly using:
+#     from app_name.models import ...       # Correct
+# Do NOT include the 'apps' prefix in imports:
+#     from apps.app_name.models import ...  # Incorrect - causes model duplication errors
+
+
+from accounts.models import (
     User, Role, Seller, Buyer, Private, Shopkeeper
 )
 
-from apps.auctions.models import (
+from auctions.models import (
     Category, Auction, Offer, WinnerOffer
 )
 
-from apps.favorites.models import (
+from favorites.models import (
     FavoriteAuction, RecentlyViewedAuction
 )
 
-from apps.inbox.models import (
+from inbox.models import (
     Notification
 )
 
-from apps.reviews.models import (
+from reviews.models import (
     Review
 )
 
-from apps.wallet.models import (
+from wallet.models import (
     Wallet, Transaction
 )
 
@@ -36,11 +46,17 @@ from apps.wallet.models import (
 class ManageDB():
     
     _models = list(reversed([
+        # Accounts
         User, Role, Seller, Buyer, Private, Shopkeeper, 
+        # Auctions
         Category, Auction, Offer, WinnerOffer,
+        # Favourites
         FavoriteAuction, RecentlyViewedAuction,
+        # Inbox
         Notification,
+        # Reviews
         Review,
+        # Wallet
         Wallet, Transaction,
     ]))
     
@@ -81,9 +97,9 @@ class ManageDB():
                 Shopkeeper.objects.create(user=user, business_name=f"{lname} Store", iva_number=str(randint(10000000000,99999999999)), headquarters_address="Via Roma 1")
 
             if role.type == 'BUYER':
-                Buyer.objects.create(user=role, shipping_address="Via Libertà 123")
+                Buyer.objects.create(role=role, shipping_address="Via Libertà 123")
             else:
-                Seller.objects.create(user=role, collection_address="Corso Italia 45")
+                Seller.objects.create(role=role, collection_address="Corso Italia 45")
 
         logger.info("Sample users created.")
     
@@ -92,25 +108,32 @@ class ManageDB():
     def erase_db():
         for model in ManageDB._models:
             model.objects.all().delete()
-        logging.DEBUG("Database erased succesfully.")
+        logging.info("Database erased succesfully.")
     
     @staticmethod
     @transaction.atomic
     def init_db():
         ManageDB._insert_data()
-        logging.DEBUG("Database initialized succesfully.")
+        logging.info("Database initialized succesfully.")
     
     @staticmethod
     @transaction.atomic
     def build_db():
         ManageDB.erase_db()
         ManageDB.init_db()
-        logging.DEBUG("Database built succesfully.")
+        logging.info("Database built succesfully.")
+
+
+
 
 
 def run(*args):
+    # runscript entry point
     ManageDB.build_db()
+
+
+
 
 
 if __name__ == '__main__':
-    ManageDB.build_db()
+    run()
