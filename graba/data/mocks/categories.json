@@ -1,0 +1,80 @@
+{
+    "Electronics & Technology": [
+        "Computers & Accessories",
+        "Mobile Phones & Tablets",
+        "Smart Home Devices",
+        "Cameras & Photography",
+        "Audio & Headphones",
+        "Wearables (Smartwatches, Fitness Trackers)"
+    ],
+    "Home & Living": [
+        "Furniture",
+        "Kitchen & Dining",
+        "Home Decor",
+        "Bedding & Bath",
+        "Tools & DIY",
+        "Lighting"
+    ],
+    "Fashion & Apparel": [
+        "Mens Clothing",
+        "Womens Clothing",
+        "Kids & Baby Clothing",
+        "Shoes",
+        "Bags & Accessories",
+        "Jewelry & Watches"
+    ],
+    "Grocery & Food": [
+        "Beverages",
+        "Fresh Produce",
+        "Snacks",
+        "Organic & Health Foods",
+        "Pantry Staples"
+    ],
+    "Sports & Outdoors": [
+        "Fitness Equipment",
+        "Camping & Hiking",
+        "Bicycles & Accessories",
+        "Team Sports Gear",
+        "Outdoor Clothing"
+    ],
+    "Health & Beauty": [
+        "Skincare",
+        "Haircare",
+        "Cosmetics & Makeup",
+        "Vitamins & Supplements",
+        "Personal Care"
+    ],
+    "Baby & Kids": [
+        "Toys",
+        "Baby Gear (strollers, car seats)",
+        "Educational Materials",
+        "Diapers & Wipes",
+        "Kids Furniture"
+    ],
+    "Pets": [
+        "Pet Food",
+        "Toys & Accessories",
+        "Grooming",
+        "Pet Health Products"
+    ],
+    "Books, Media & Entertainment": [
+        "Books & eBooks",
+        "Movies & TV",
+        "Music",
+        "Video Games",
+        "Board Games"
+    ],
+    "Automotive": [
+        "Car Accessories",
+        "Motorbike Gear",
+        "Tools & Equipment",
+        "Oils & Fluids"
+    ],
+    "Gifts & Hobbies": [
+        "Crafts & DIY Kits",
+        "Collectibles",
+        "Stationery",
+        "Seasonal Gifts",
+        "Party Supplies"
+    ]
+}

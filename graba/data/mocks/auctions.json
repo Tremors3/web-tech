@@ -1,0 +1,44 @@
+{
+    "title": [
+        "Sneakers Running Uomo Nike Air Zoom Pegasus 40",
+        "Cuffie Bluetooth Noise Cancelling Sony WH-1000XM5",
+        "Set Pentole Antiaderenti 10 Pezzi  Acciaio Inox",
+        "Divano 3 Posti in Tessuto con Chaise Longue  Grigio Antracite",
+        "Zaino Outdoor Impermeabile da 40L  Trekking & Escursionismo",
+        "Orologio Smartwatch Amazfit GTR 4  GPS & Monitoraggio Salute",
+        "LEGO Star Wars  Millennium Falcon (Set da Costruzione)",
+        "Crema Viso Idratante Bio  Aloe Vera & Acido Ialuronico",
+        "Alimento Secco per Cani  Royal Canin Maxi Adult 15kg",
+        "Giacca Invernale Donna con Cappuccio  Piumino Termico"
+    ],
+    "image_url": [
+        "https://picsum.photos/200",
+        "https://picsum.photos/300",
+        "https://picsum.photos/300/200",
+        "https://picsum.photos/200/300"
+    ],
+    "description": [
+        "Scarpe da corsa leggere e reattive, ideali per allenamenti intensi e lunghe distanze.",
+        "Cuffie wireless con cancellazione attiva del rumore, audio ad alta fedelt e autonomia di 30 ore.",
+        "Set completo di pentole antiaderenti, perfette per cucinare ogni giorno con stile e praticit.",
+        "Divano moderno con chaise longue, rivestito in tessuto resistente e facile da pulire.",
+        "Zaino tecnico da escursionismo, con schienale traspirante e copertura antipioggia inclusa.",
+        "Smartwatch con monitoraggio della salute, GPS integrato e oltre 120 modalit sportive.",
+        "Set LEGO dettagliato del celebre Millennium Falcon, ideale per appassionati di Star Wars.",
+        "Crema viso naturale, idratante e lenitiva, adatta anche alle pelli pi sensibili.",
+        "Crocchette di alta qualit per cani adulti di taglia grande, con formula bilanciata e digeribile.",
+        "Giacca invernale calda e leggera, perfetta per affrontare il freddo con stile."
+    ],
+    "technical_details": [
+        "Peso: 280g | Suola: Gomma con tecnologia Zoom Air | Tomaia: Mesh traspirante | Drop: 10mm",
+        "Driver da 30mm | Autonomia: fino a 30 ore | Bluetooth 5.2 | Ricarica rapida USB-C",
+        "Materiale: Acciaio inox + rivestimento antiaderente | Compatibile con induzione | Manici ergonomici in silicone",
+        "Dimensioni: 230x95x160 cm | Tessuto: poliestere 100% | Struttura: legno massello | Cuscini sfoderabili",
+        "Capacit: 40L | Materiale: nylon ripstop impermeabile | Tasche: 6 | Peso: 950g",
+        "Display AMOLED 1.43 | Autonomia: fino a 14 giorni | Sensori: SpO2, battito, GPS | Impermeabilit: 5 ATM",
+        "Numero pezzi: 1353 | Et consigliata: 9+ anni | Include minifigure originali | Dimensioni costruzione: 44 x 32 cm",
+        "Formato: 50 ml | Ingredienti principali: Aloe Vera, Acido Ialuronico, Vitamina E | pH dermatologicamente testato",
+        "Peso netto: 15 kg | Tipo: secco | Composizione: proteine 26%, grassi 17% | Adatto a cani >25 kg",
+        "Materiale esterno: poliestere impermeabile | Imbottitura: piuma sintetica | Tasche: 4 | Chiusura: zip con patta antivento"
+    ]
+}
