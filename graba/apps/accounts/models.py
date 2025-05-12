@@ -27,7 +27,7 @@ class User(AbstractUser):
     #password_hash = models.CharField(max_length=255)
     registration_date = models.DateTimeField(default=timezone.now)
     state = models.CharField(max_length=10, choices=STATE_CHOICES, default='ACTIVE')
-    legal_type = models.CharField(max_length=10, choices=LEGAL_TYPE_CHOICES)
+    legal_type = models.CharField(max_length=10, choices=LEGAL_TYPE_CHOICES, default='PRIVATE')
 
     def __str__(self):
         return self.username

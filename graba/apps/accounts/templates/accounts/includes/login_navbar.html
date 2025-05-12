@@ -1,0 +1,10 @@
+{% extends 'base/includes/navbar.html' %}
+{% load static %}
+
+{% block navbar_content %}{% endblock %}
+
+{% block navbar_custom_links %}
+<li class="nav-item">
+    <a class="nav-link" href="{% url 'accounts:signin' %}">Sign In</a>
+</li>
+{% endblock %}

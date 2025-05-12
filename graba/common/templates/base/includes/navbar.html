@@ -1,42 +1,32 @@
+{% load static %}
+
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
     <div class="container-lg">
-        <!-- Brand / Nome del sito -->
-        <a class="navbar-brand fw-bold" href="{% url 'home' %}">Graba</a>
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold" href="{% url 'core:home' %}">Graba</a>
 
-        <!-- Toggle button per mobile -->
+        <!-- Toggle button for mobile -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- Navbar Content -->
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <!-- Search Form (centrato) -->
-            <form class="d-flex mx-auto w-100 justify-content-center" role="search" method="get" action="{% url 'home' %}"> <!-- url 'search' -->
-                <div class="input-group w-75">
-                    <select class="form-select" name="category">
-                        <option value="">Tutte</option>
-                        <option value="electronics">Elettronica</option>
-                        <option value="fashion">Moda</option>
-                        <option value="books">Libri</option>
-                        <!-- Aggiungi altre categorie -->
-                    </select>
-                    <input class="form-control" type="search" placeholder="Cerca prodotti..." name="q" aria-label="Cerca">
-                    <button class="btn btn-outline-primary" type="submit">Cerca</button>
-                </div>
-            </form>
+            
+            <!-- Navbar Content -->
+            {% block navbar_content %}{% endblock %}
 
-            <!-- Bottoni destra -->
+            <!-- Right Buttons -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                
+                <!-- Custom Buttons -->
+                {% block navbar_custom_links %}{% endblock %}
+
+                <!-- Default Buttons -->
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Carrello</a>  <!-- url 'cart' -->
+                    <a class="nav-link" href="{% url 'core:home' %}">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Accedi</a>  <!-- url 'login' -->
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Profilo</a>  <!-- url 'profile' -->
-                </li>
+
             </ul>
         </div>
     </div>

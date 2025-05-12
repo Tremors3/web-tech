@@ -1,1 +1,18 @@
-<h1>Hello, World!</h1>
+{% extends 'base/base_column.html' %}
+{% load static %}
+
+{% block navbar %} {% include 'core/includes/index_navbar.html' %} {% endblock %}
+
+{% block title %}Home | Graba{% endblock %}
+
+{% block main_column %}
+<div class="card bg-white rounded shadow p-4">
+    <h2 class="mb-4 text-center">
+        {% if request.user.is_authenticated %}
+            Welcome {{ request.user.username }}!
+        {% else %}
+            Welcome Guest User!
+        {% endif %}
+    </h2>
+</div>
+{% endblock %}
