@@ -1,7 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.views.generic.edit import FormView
+from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.db import transaction
+
+
 from .forms import UserRegistrationForm, CustomLoginForm
 from .models import Role, Buyer, Seller, Private, Shopkeeper
 from .mixins import RedirectAuthenticatedUserMixin

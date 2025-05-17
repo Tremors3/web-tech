@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
@@ -29,6 +31,27 @@ class User(AbstractUser):
     state = models.CharField(max_length=10, choices=STATE_CHOICES, default='ACTIVE')
     legal_type = models.CharField(max_length=10, choices=LEGAL_TYPE_CHOICES, default='PRIVATE')
 
+    def has_role(self, role_name: str) -> bool:
+        return Role.objects.filter(user=self, type=role_name).exists()
+    
+    def get_role_instances(self) -> Dict[str, Any]:
+        roles = Role.objects.filter(user=self, state='ACTIVE')
+        instances: Dict[str, Any] = {}
+        
+        ROLE_TYPE_MAP = {
+            'BUYER': Buyer,
+            'SELLER': Seller
+        }
+        
+        for role in roles:
+            model = ROLE_TYPE_MAP.get(role.type)
+            if model:
+                instance = model.object.filter(role=role).first()
+                if instance:
+                    instances[role.type] = instance
+
+        return instances
+    
     def __str__(self):
         return self.username
     
@@ -69,7 +92,7 @@ class Buyer(models.Model):
     shipping_address = models.TextField()
 
     def __str__(self):
-        return f"Buyer {self.user.user.username}"
+        return f"Buyer {self.role.user.username}"
 
     class Meta:
         verbose_name = "Buyer"
@@ -83,7 +106,7 @@ class Seller(models.Model):
     collection_address = models.TextField()
 
     def __str__(self):
-        return f"Seller {self.user.user.username}"
+        return f"Seller {self.role.user.username}"
     
     class Meta:
         verbose_name = "Seller"

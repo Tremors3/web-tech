@@ -9,5 +9,6 @@ app_name = 'accounts'
 urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('signin/', UserRegisterView.as_view(), name='signin'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='core:home'), name='logout')
+    path('logout/', auth_views.LogoutView.as_view(next_page='core:home'), name='logout'),
+    #path('profile/<int:pk>/', ProfileView.as_view(), name='profile'),
 ]

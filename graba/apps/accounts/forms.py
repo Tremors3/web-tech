@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate
-from .models import User, Private, Shopkeeper
+from .models import User, Private, Shopkeeper, Buyer, Seller
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -61,11 +61,11 @@ class UserRegistrationForm(UserCreationForm):
             self.add_error('shipping_address', f'The shipping address is required for buyer users.')
         
         # Check seller user fields
-        elif 'SELLER' in selected_roles and not cleaned_data.get('collection_address'):
+        if 'SELLER' in selected_roles and not cleaned_data.get('collection_address'):
             self.add_error('collection_address', f'The collection address is required for seller users.')
         
         # The user must have at least one role
-        elif not selected_roles:
+        if not selected_roles:
             self.add_error('role_types', 'You must select at least one role.')
             
 
