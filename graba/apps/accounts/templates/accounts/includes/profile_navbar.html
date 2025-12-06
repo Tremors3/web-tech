@@ -4,7 +4,12 @@
 {% block navbar_content %}{% endblock %}
 
 {% block navbar_custom_links %}
-<li class="nav-item">
-    <a class="nav-link" href="{% url 'core:home' %}">Home</a>
-</li>
+{% if request.user.is_authenticated %}
+    <!-- User is logged -->
+    <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button class="nav-link btn btn-link" type="submit">Logout</button>
+    </form>
+{% endif %}
+<a class="nav-link" href="{% url 'core:home' %}">Home</a>
 {% endblock %}

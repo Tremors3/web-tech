@@ -1,13 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.db import transaction
 
 
-from .forms import UserRegistrationForm, CustomLoginForm
-from .models import Role, Buyer, Seller, Private, Shopkeeper
+from .forms import UserRegistrationForm, CustomLoginForm, UserProfileForm
+from .models import User, Role, Buyer, Seller, Private, Shopkeeper
 from .mixins import RedirectAuthenticatedUserMixin
 
 
@@ -63,3 +63,12 @@ class UserLoginView(LoginView):
 
     def get_success_url(self):
         return self.get_redirect_url() or reverse('core:home')
+
+class UserProfileView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = UserProfileForm
+    template_name = "accounts/profile.html"
+    success_url = reverse_lazy("accounts:profile")
+
+    def get_object(self):
+        return self.request.user

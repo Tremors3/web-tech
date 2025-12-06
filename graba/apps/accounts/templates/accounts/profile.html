@@ -1,9 +1,179 @@
 {% extends 'base/base_column.html' %}
 
-{% block navbar %} {% include 'accounts/includes/profile_navbar.html' %} {% endblock %}
+{% block navbar %}
+    {% include 'accounts/includes/profile_navbar.html' %}
+{% endblock %}
 
-{% block title %}User Profile | Graba{% endblock %}
+{% block title %}Edit Profile | Graba{% endblock %}
 
-{% block main_column %} {% endblock %}
+{% block main_column %}
+<div class="card col-12 col-md-9 col-lg-6 col-xl-5 bg-white rounded shadow p-4">
+    <h2 class="mb-4 text-center">Edit Profile</h2>
 
-{% block extra_js %} <script></script> {% endblock %}
+    <form id="profile-form" method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- User Fields -->
+        <h4 class="mt-4">User Info</h4>
+        <div class="border rounded p-3 mb-3 bg-light-subtle">
+            <div class="mb-3">
+                {{ form.email.label_tag }} {{ form.email }} {{ form.email.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.username.label_tag }} {{ form.username }} {{ form.username.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.bio.label_tag }} {{ form.bio }} {{ form.bio.errors }}
+            </div>
+        </div>
+
+        <!-- Legal Type (NOT editable, so hidden) -->
+        {{ form.legal_type.as_hidden }}
+
+        {% if request.user.legal_type == "PRIVATE" %}
+        <!-- Private User Fields -->
+        <div id="private-fields" class="border rounded p-3 mb-3 bg-light-subtle">
+            <h5>Private User Info</h5>
+            <div class="mb-3">
+                {{ form.first_name.label_tag }} {{ form.first_name }} {{ form.first_name.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.last_name.label_tag }} {{ form.last_name }} {{ form.last_name.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.fiscal_code.label_tag }} {{ form.fiscal_code }} {{ form.fiscal_code.errors }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if request.user.legal_type == "SHOPKEEPER" %}
+        <!-- Shopkeeper Fields -->
+        <div id="shopkeeper-fields" class="border rounded p-3 mb-3 bg-light-subtle">
+            <h5>Shopkeeper Info</h5>
+            <div class="mb-3">
+                {{ form.business_name.label_tag }} {{ form.business_name }} {{ form.business_name.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.headquarters_address.label_tag }} {{ form.headquarters_address }} {{ form.headquarters_address.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.iva_number.label_tag }} {{ form.iva_number }} {{ form.iva_number.errors }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Roles -->
+        <h4 class="mt-4">Your Roles</h4>
+        <div class="mb-3">
+            {{ form.role_types }} {{ form.role_types.errors }}
+        </div>
+
+        <!-- Buyer -->
+        <div id="buyer-fields" class="border rounded p-3 mb-3 bg-light-subtle">
+            <h5>Buyer Fields</h5>
+            <div class="mb-3">
+                {{ form.shipping_address.label_tag }} {{ form.shipping_address }} {{ form.shipping_address.errors }}
+            </div>
+        </div>
+
+        <!-- Seller -->
+        <div id="seller-fields" class="border rounded p-3 mb-3 bg-light-subtle">
+            <h5>Seller Fields</h5>
+            <div class="mb-3">
+                {{ form.collection_address.label_tag }} {{ form.collection_address }} {{ form.collection_address.errors }}
+            </div>
+        </div>
+
+        <p><strong>Note:</strong></p>
+        <ul>
+            <li>If a role is not checked, it will be added automatically.</li>
+            <li>If a role is unchecked, it will not be removed.</li>
+        </ul>
+        
+        <!-- Buttons -->
+        <div class="mt-3">
+            <button type="button" id="enable-editing" class="btn btn-secondary mt-3 w-100"> Enable Editing </button>
+            <button type="submit" id="save-btn" class="btn btn-primary mt-3 w-100" style="display:none;"> Save Changes </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* Toggle Private or Shopkeeper fields */
+    document.addEventListener("DOMContentLoaded", function () {
+        const legalTypeField = document.getElementById("id_legal_type");
+        if (!legalTypeField) return;
+
+        const privateFields = document.getElementById("private-fields");
+        const shopkeeperFields = document.getElementById("shopkeeper-fields");
+
+        function toggleLegalTypeFields() {
+            const selected = legalTypeField.value;
+            if (selected === "PRIVATE") {
+                privateFields.style.display = "block";
+                if (shopkeeperFields) shopkeeperFields.style.display = "none";
+            } else if (selected === "SHOPKEEPER") {
+                if (privateFields) privateFields.style.display = "none";
+                shopkeeperFields.style.display = "block";
+            }
+        }
+        toggleLegalTypeFields();
+    });
+
+    /* Show Roles fields */
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleCheckboxes = document.querySelectorAll('input[name="role_types"]');
+        const buyerFields = document.getElementById("buyer-fields");
+        const sellerFields = document.getElementById("seller-fields");
+
+        function toggleRoleFields() {
+            const roles = Array.from(roleCheckboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            buyerFields.style.display = roles.includes("BUYER") ? "block" : "none";
+            sellerFields.style.display = roles.includes("SELLER") ? "block" : "none";
+        }
+
+        roleCheckboxes.forEach(cb => cb.addEventListener("change", toggleRoleFields));
+        toggleRoleFields();
+    });
+
+    /* Enable Editing Mode */
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const form = document.getElementById("profile-form");
+        const enableBtn = document.getElementById("enable-editing");
+        const saveBtn = document.getElementById("save-btn");
+
+        const textFields = form.querySelectorAll("input[type='text'], input[type='email'], textarea");
+        const selectFields = form.querySelectorAll("select");
+        const checkboxFields = form.querySelectorAll("input[type='checkbox']");
+
+        // 1. Lock (set readonly/disable) all fields
+        textFields.forEach(f => f.setAttribute("readonly", true));
+        selectFields.forEach(f => f.setAttribute("disabled", true));
+        checkboxFields.forEach(f => f.setAttribute("disabled", true));
+
+        // 2. Button for enableing the editing
+        enableBtn.addEventListener("click", function () {
+
+            // Unlock all the fields
+            textFields.forEach(f => f.removeAttribute("readonly"));
+            selectFields.forEach(f => f.removeAttribute("disabled"));
+            checkboxFields.forEach(f => f.removeAttribute("disabled")); // Keep role checkbox disabled
+
+            // Keep readonly field disabled
+            const lt = document.getElementById("id_legal_type");
+            if (lt) lt.setAttribute("readonly", true);
+
+            enableBtn.style.display = "none";
+            saveBtn.style.display = "block";
+        });
+
+    });
+</script>
+{% endblock %}

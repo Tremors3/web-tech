@@ -5,7 +5,7 @@
 {% block title %}Sign In | Graba{% endblock %}
 
 {% block main_column %}
-<div class="card col-12 col-md-9 col-lg-6 col-xl-4 bg-white rounded shadow p-4">
+<div class="card col-12 col-md-9 col-lg-6 col-xl-5 bg-white rounded shadow p-4">
     <h2 class="mb-4 text-center">Sign In</h2>
     <form method="post" novalidate>
         {% csrf_token %}
@@ -95,46 +95,48 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Form field ids: "id_<field_name>"
-    const legalTypeField = document.getElementById("id_legal_type");
-    const privateFields = document.getElementById("private-fields");
-    const shopkeeperFields = document.getElementById("shopkeeper-fields");
+    /* Toggle Private or Shopkeeper fields */
+    document.addEventListener("DOMContentLoaded", function () {
+        // Form field ids: "id_<field_name>"
+        const legalTypeField = document.getElementById("id_legal_type");
+        const privateFields = document.getElementById("private-fields");
+        const shopkeeperFields = document.getElementById("shopkeeper-fields");
 
-    function toggleLegalTypeFields() {
-        const selected = legalTypeField.value;
-        if (selected === "PRIVATE") {
-            privateFields.style.display = "block";
-            shopkeeperFields.style.display = "none";
-        } else if (selected === "SHOPKEEPER") {
-            privateFields.style.display = "none";
-            shopkeeperFields.style.display = "block";
-        } else {
-            privateFields.style.display = "none";
-            shopkeeperFields.style.display = "none";
+        function toggleLegalTypeFields() {
+            const selected = legalTypeField.value;
+            if (selected === "PRIVATE") {
+                privateFields.style.display = "block";
+                shopkeeperFields.style.display = "none";
+            } else if (selected === "SHOPKEEPER") {
+                privateFields.style.display = "none";
+                shopkeeperFields.style.display = "block";
+            } else {
+                privateFields.style.display = "none";
+                shopkeeperFields.style.display = "none";
+            }
         }
-    }
 
-    legalTypeField.addEventListener("change", toggleLegalTypeFields);
-    toggleLegalTypeFields();
-});
+        legalTypeField.addEventListener("change", toggleLegalTypeFields);
+        toggleLegalTypeFields();
+    });
 
-document.addEventListener("DOMContentLoaded", function () {
-    const roleCheckboxes = document.querySelectorAll('input[name="role_types"]');
-    const buyerFields = document.getElementById("buyer-fields");
-    const sellerFields = document.getElementById("seller-fields");
-    
-    function toggleRoleFields() {
-        let roles = Array.from(roleCheckboxes)
-                          .filter(checkbox => checkbox.checked)
-                          .map(checkbox => checkbox.value);
-    
-        buyerFields.style.display = roles.includes("BUYER") ? "block" : "none";
-        sellerFields.style.display = roles.includes("SELLER") ? "block" : "none";
-    }
-    
-    roleCheckboxes.forEach(cb => cb.addEventListener("change", toggleRoleFields));
-    toggleRoleFields();
-});
+    /* Show Roles fields */
+    document.addEventListener("DOMContentLoaded", function () {
+        const roleCheckboxes = document.querySelectorAll('input[name="role_types"]');
+        const buyerFields = document.getElementById("buyer-fields");
+        const sellerFields = document.getElementById("seller-fields");
+        
+        function toggleRoleFields() {
+            let roles = Array.from(roleCheckboxes)
+                            .filter(checkbox => checkbox.checked)
+                            .map(checkbox => checkbox.value);
+        
+            buyerFields.style.display = roles.includes("BUYER") ? "block" : "none";
+            sellerFields.style.display = roles.includes("SELLER") ? "block" : "none";
+        }
+        
+        roleCheckboxes.forEach(cb => cb.addEventListener("change", toggleRoleFields));
+        toggleRoleFields();
+    });
 </script>
 {% endblock %}

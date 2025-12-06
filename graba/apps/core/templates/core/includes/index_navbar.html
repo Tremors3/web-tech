@@ -12,7 +12,7 @@
             {% csrf_token %}
             <button class="nav-link btn btn-link" type="submit">Logout</button>
         </form>
-        <a class="nav-link" href="{% url 'core:home' %}">Profile</a> <!-- 'core:home' to 'accounts:profile' -->
+        <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
     {% else %}
         <!-- User is not logged -->
         <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
