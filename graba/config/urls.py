@@ -30,6 +30,9 @@ urlpatterns = [
 
     # Accounts
     path('accounts/', include('accounts.urls', namespace='accounts')),
+    
+    # Favorites
+    path('favorites/', include('favorites.urls', namespace='favorites')),
 ]
 
 

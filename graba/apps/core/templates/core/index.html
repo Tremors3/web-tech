@@ -1,15 +1,22 @@
 {% extends 'base/base_column.html' %}
 {% load static %}
+{% load custom_filters %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'core/css/base.css' %}">
+{% endblock %}
 
 {% block navbar %} {% include 'core/includes/index_navbar.html' %} {% endblock %}
 
 {% block title %}Graba | Home Page{% endblock %}
 
 {% block main_column %}
+<div class="d-flex flex-column gap-4 pt-4">
 
-<div class="d-flex flex-column gap-4">
-
+    <!-- FIRST SECTION -->
     <div class="card bg-white rounded shadow pt-4 px-4">
+
+        <!-- Welcome Message -->
         <h2 class="mb-4 text-center">
             {% if request.user.is_authenticated %}
                 Welcome {{ request.user.username }}!
@@ -19,9 +26,11 @@
         </h2>
     </div>
 
+    <!-- SECOND SECTION -->
     <div class="card bg-white rounded shadow pt-4 px-4">
         {% if auctions %}
 
+            <!-- Section title -->
             <h2 class="mb-4 text-left">Search Results</h2>
 
             <!-- Auctions -->
@@ -30,26 +39,64 @@
                     <div class="col">
                         <div class="card h-100 shadow-sm">
 
-                            <!-- Immagine dell’asta (fallback se non esiste) -->
-                            {% if auction.image_url %}
-                                <img src="{{ auction.image_url }}" class="card-img-top" alt="{{ auction.title }}" style="width: 100%; height: 200px; object-fit: contain; background-color: #f8f9fa;">
-                            {% else %}
-                                <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top" alt="No Image">
-                            {% endif %}
+                            <!-- CARD TOP -->
+                            <div class="position-relative">
 
+                                <!-- RESIZED IMAGE -->
+                                {% if auction.image_url %}
+                                    <img src="{{ auction.image_url }}" class="card-img-top"
+                                        alt="{{ auction.title }}"
+                                        style="width:100%; height:200px; object-fit:contain; background-color:#f8f9fa;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top" alt="No Image">
+                                {% endif %}
+
+                                <!-- BOOKMARK ICON -->
+                                {% if request.user.is_authenticated %}
+                                    <div class="favorite-toggle"
+                                        data-auction="{{ auction.id }}"
+                                        style="position:absolute; top:10px; right:10px; cursor:pointer;">
+                                        
+                                        {% if auction.id in user_favorites %}
+                                            <i class="bi bi-bookmark-fill text-dark"></i>
+                                        {% else %}
+                                            <i class="bi bi-bookmark text-dark"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- CARD BODY -->
                             <div class="card-body">
                                 <h5 class="card-title">{{ auction.title|truncatewords:10 }}</h5>
                                 <p class="card-text">{{ auction.description|truncatewords:20 }}</p>
                             </div>
 
-                            <div class="card-footer bg-white border-0">
+                            <!-- CARD FOOTER -->
+                            <div class="card-footer bg-white border-0 py-2 px-3">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fw-bold text-primary">
-                                        €{{ auction.buy_now_price_cents }}
-                                    </span>
+                                    <div class="d-flex flex-column">
+                                        {% if auction.has_offers %}
+                                            <span class="badge bg-warning mb-1">
+                                                Current offer: € {{ auction.get_highest_offer_value|cents_to_price }}
+                                            </span>
+                                        {% else %}
+                                            {% if auction.min_price_cents %}
+                                                <span class="badge bg-primary mb-1">
+                                                    Starting at: € {{ auction.min_price_cents|cents_to_price }}
+                                                </span>
+                                            {% endif %}
+                                            {% if auction.buy_now_price_cents %}
+                                                <span class="badge bg-success mb-1">
+                                                    Buy-now: € {{ auction.buy_now_price_cents|cents_to_price }}
+                                                </span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
                                     <a href="{% url 'core:home' %}" class="btn btn-sm btn-outline-primary">
                                         View
-                                    </a>
+                                    </a> <!-- url 'core:auction_detail' auction.id -->
                                 </div>
                             </div>
 
@@ -107,4 +154,29 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* Ajax call to toggle favorites */
+    document.querySelectorAll('.favorite-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const auctionId = btn.dataset.auction;
+
+            fetch(`/favorites/${auctionId}/toggle/`)
+                .then(response => response.json())
+                .then(data => {
+                    const icon = btn.querySelector('i');
+
+                    if (data.favorite) {
+                        icon.classList.remove('bi-bookmark');
+                        icon.classList.add('bi-bookmark-fill');
+                    } else {
+                        icon.classList.remove('bi-bookmark-fill');
+                        icon.classList.add('bi-bookmark');
+                    }
+                });
+        });
+    });
+</script>
 {% endblock %}

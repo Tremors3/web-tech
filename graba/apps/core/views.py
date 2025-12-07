@@ -1,9 +1,9 @@
 from django.views.generic import ListView
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render
-from django.utils.http import urlencode
 from django.db.models import Q
+
+
 from auctions.models import Auction
+from favorites.models import FavoriteAuction
 
 
 class HomePageView(ListView):
@@ -36,5 +36,11 @@ class HomePageView(ListView):
 
         # Querystring clear for pagination
         context['querystring'] = params.urlencode()
+        
+        # Add favorites to context ONLY if user is authenticated
+        context['user_favorites'] = set(
+            FavoriteAuction.objects.filter(user=self.request.user)
+            .values_list('auction_id', flat=True)
+        ) if self.request.user.is_authenticated else set()
 
         return context

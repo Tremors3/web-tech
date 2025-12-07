@@ -1,7 +1,7 @@
-from django.db import models
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator, EmailValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db import models
 
 
 class Category(models.Model):
@@ -43,6 +43,18 @@ class Auction(models.Model):
     seller = models.ForeignKey('accounts.Seller', on_delete=models.CASCADE)
     category = models.ForeignKey('auctions.Category', null=True, on_delete=models.SET_NULL)
 
+    @property
+    def has_offers(self, type_:str='BID') -> int:
+        return Offer.objects.filter(auction=self, type=type_).exists()
+
+    def get_offers_number(self, type_:str='BID') -> int:
+        return Offer.objects.filter(auction=self, type=type_).count()
+
+    def get_highest_offer_value(self, type_:str='BID') -> int | None:
+        return Offer.objects.filter(auction=self, type=type_).aggregate(
+            highest=models.Max('amount_cents')
+        )['highest']
+    
     def __str__(self):
         return self.title
 
