@@ -164,6 +164,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # ==================== Custom Loggers ==================== #
 # ======================================================== #
 
+# https://docs.djangoproject.com/en/5.2/topics/logging/#loggers
+
 from scripts.logger import CustomFormatter
 
 LOGGING = {
@@ -185,7 +187,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['colored_console'],
-            'level': 'WARNING',
+            'level': 'INFO',
             'propagate': True,
         },
         'custom': {
