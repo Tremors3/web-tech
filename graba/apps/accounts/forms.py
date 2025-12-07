@@ -8,7 +8,11 @@ from .models import User, Private, Shopkeeper, Buyer, Seller, Role
 class UserRegistrationForm(UserCreationForm):
     ROLE_CHOICES = [('BUYER', 'Buyer'), ('SELLER', 'Seller')]
     
-    role_types = forms.MultipleChoiceField(choices=ROLE_CHOICES, widget=forms.CheckboxSelectMultiple)
+    role_types = forms.MultipleChoiceField(
+        choices=ROLE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
     
     # Private / Shopkeeper fields
     first_name = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
@@ -81,27 +85,26 @@ class CustomLoginForm(AuthenticationForm):
 
 
 class UserProfileForm(forms.ModelForm):
-    """Form to Update user's profile, and manage it's roles and extra fields."""
-
     ROLE_CHOICES = [('BUYER', 'Buyer'), ('SELLER', 'Seller')]
+    
     role_types = forms.MultipleChoiceField(
         choices=ROLE_CHOICES,
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
-
+    
     # Private / Shopkeeper fields
-    first_name = forms.CharField(required=False)
-    last_name = forms.CharField(required=False)
-    fiscal_code = forms.CharField(required=False)
+    first_name = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
+    last_name = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
+    fiscal_code = forms.CharField(required=False, min_length=16, max_length=16, strip=True)
 
-    business_name = forms.CharField(required=False)
-    headquarters_address = forms.CharField(required=False)
-    iva_number = forms.CharField(required=False)
+    business_name = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
+    headquarters_address = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
+    iva_number = forms.CharField(required=False, min_length=11, max_length=11, strip=True)
 
     # Buyer / Seller fields
-    shipping_address = forms.CharField(required=False)
-    collection_address = forms.CharField(required=False)
+    shipping_address = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
+    collection_address = forms.CharField(required=False, min_length=5, max_length=100, strip=True)
 
     class Meta:
         model = User

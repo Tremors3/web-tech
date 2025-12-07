@@ -1,142 +1,196 @@
 {% extends 'base/base_column.html' %}
+{% load static %}
 
 {% block navbar %} {% include 'accounts/includes/signin_navbar.html' %} {% endblock %}
 
 {% block title %}Sign In | Graba{% endblock %}
 
 {% block main_column %}
-<div class="card col-12 col-md-9 col-lg-6 col-xl-5 bg-white rounded shadow p-4">
-    <h2 class="mb-4 text-center">Sign In</h2>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        {{ form.non_field_errors }}
+<div class="d-flex flex-column align-items-center gap-4 pt-5">
 
-        <!-- User Fields -->
-        <h4 class="mt-4">User Info</h4>
-        <div class="border rounded p-3 mb-3 bg-light-subtle">
-            <div class="mb-3">
-                {{ form.email.label_tag }} {{ form.email }} {{ form.email.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.username.label_tag }} {{ form.username }} {{ form.username.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.bio.label_tag }} {{ form.bio }} {{ form.bio.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.password1.label_tag }} {{ form.password1 }} {{ form.password1.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.password2.label_tag }} {{ form.password2 }} {{ form.password2.errors }}
-            </div>
-        </div>
+    <!-- FIRST SECTION -->
+    <div class="card col-10 col-md-8 col-lg-6 col-xl-5 bg-white rounded shadow gap-4 py-4 px-4">
+    
+        <h2 class="text-center">Sign In</h2>
 
-        <!-- Legal Type -->
-        <h4 class="mt-4">Select the Legal Type</h4>
-        <div class="mb-3">
-            {{ form.legal_type.label_tag }} {{ form.legal_type }} {{ form.legal_type.errors }}
-        </div>
+        <form method="post" class="d-flex flex-column gap-4" novalidate>
+            {% csrf_token %}
 
-        <!-- Private User Fields -->
-        <div id="private-fields" class="border rounded p-3 mb-3 bg-light-subtle">
-            <h5>Private User Info</h5>
-            <div class="mb-3">
-                {{ form.first_name.label_tag }} {{ form.first_name }} {{ form.first_name.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.last_name.label_tag }} {{ form.last_name }} {{ form.last_name.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.fiscal_code.label_tag }} {{ form.fiscal_code }} {{ form.fiscal_code.errors }}
-            </div>
-        </div>
+            <!-- Non Field Errors -->
+            {{ form.non_field_errors }}
 
-        <!-- Shopkeeper Fields -->
-        <div id="shopkeeper-fields" class="border rounded p-3 mb-3 bg-light-subtle">
-            <h5>Shopkeeper Info</h5>
-            <div class="mb-3">
-                {{ form.business_name.label_tag }} {{ form.business_name }} {{ form.business_name.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.headquarters_address.label_tag }} {{ form.headquarters_address }} {{ form.headquarters_address.errors }}
-            </div>
-            <div class="mb-3">
-                {{ form.iva_number.label_tag }} {{ form.iva_number }} {{ form.iva_number.errors }}
-            </div>
-        </div>
+            <!-- User Fields -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Enter Account Info</h5>
+                
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.email.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                </div>
 
-        <!-- Roles -->
-        <h4 class="mt-4">Select the Roles</h4>
-        <div class="mb-3">
-            {{ form.role_types }} {{ form.role_types.errors }}
-        </div>
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.username.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+                </div>
 
-        <!-- Buyer -->
-        <div id="buyer-fields" class="border rounded p-3 mb-3 bg-light-subtle">
-            <h5>Buyer Fields</h5>
-            <div class="mb-3">
-                {{ form.shipping_address.label_tag }} {{ form.shipping_address }} {{ form.shipping_address.errors }}
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.bio.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.bio }}
+                        {{ form.bio.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.password1.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.password1 }}
+                        {{ form.password1.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.password2.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.password2 }}
+                        {{ form.password2.errors }}
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Seller -->
-        <div id="seller-fields" class="border rounded p-3 mb-3 bg-light-subtle">
-            <h5>Seller Fields</h5>
-            <div class="mb-3">
-                {{ form.collection_address.label_tag }} {{ form.collection_address }} {{ form.collection_address.errors }}
+            <!-- Legal Type -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Select the legal type</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.legal_type.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.legal_type }}
+                        {{ form.legal_type.errors }}
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <button type="submit" class="btn btn-primary mt-3 w-100">Sign In Now</button>
-    </form>
+            <!-- Private User Fields -->
+            <div id="private-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
+                
+                <h5>Enter User Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.first_name.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.first_name }}
+                        {{ form.first_name.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.last_name.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.last_name }}
+                        {{ form.last_name.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.fiscal_code.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.fiscal_code }}
+                        {{ form.fiscal_code.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shopkeeper Fields -->
+            <div id="shopkeeper-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
+                
+                <h5>Enter Shopkeeper Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.business_name.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.business_name }}
+                        {{ form.business_name.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.headquarters_address.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.headquarters_address }}
+                        {{ form.headquarters_address.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.iva_number.label_tag }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.iva_number }}
+                        {{ form.iva_number.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roles -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Select the Roles</h5>
+    
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        {{ form.role_types }}
+                        {{ form.role_types.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buyer -->
+            <div id="buyer-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
+                
+                <h5>Enter Buyer Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.shipping_address.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.shipping_address }}
+                        {{ form.shipping_address.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seller -->
+            <div id="seller-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
+                
+                <h5>Enter Seller Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.collection_address.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.collection_address }}
+                        {{ form.collection_address.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn btn-primary w-100">
+                Sign In Now
+            </button>
+
+        </form>
+    </div>
 </div>
 {% endblock %}
 
-
 {% block extra_js %}
-<script>
-    /* Toggle Private or Shopkeeper fields */
-    document.addEventListener("DOMContentLoaded", function () {
-        // Form field ids: "id_<field_name>"
-        const legalTypeField = document.getElementById("id_legal_type");
-        const privateFields = document.getElementById("private-fields");
-        const shopkeeperFields = document.getElementById("shopkeeper-fields");
-
-        function toggleLegalTypeFields() {
-            const selected = legalTypeField.value;
-            if (selected === "PRIVATE") {
-                privateFields.style.display = "block";
-                shopkeeperFields.style.display = "none";
-            } else if (selected === "SHOPKEEPER") {
-                privateFields.style.display = "none";
-                shopkeeperFields.style.display = "block";
-            } else {
-                privateFields.style.display = "none";
-                shopkeeperFields.style.display = "none";
-            }
-        }
-
-        legalTypeField.addEventListener("change", toggleLegalTypeFields);
-        toggleLegalTypeFields();
-    });
-
-    /* Show Roles fields */
-    document.addEventListener("DOMContentLoaded", function () {
-        const roleCheckboxes = document.querySelectorAll('input[name="role_types"]');
-        const buyerFields = document.getElementById("buyer-fields");
-        const sellerFields = document.getElementById("seller-fields");
-        
-        function toggleRoleFields() {
-            let roles = Array.from(roleCheckboxes)
-                            .filter(checkbox => checkbox.checked)
-                            .map(checkbox => checkbox.value);
-        
-            buyerFields.style.display = roles.includes("BUYER") ? "block" : "none";
-            sellerFields.style.display = roles.includes("SELLER") ? "block" : "none";
-        }
-        
-        roleCheckboxes.forEach(cb => cb.addEventListener("change", toggleRoleFields));
-        toggleRoleFields();
-    });
-</script>
+<!-- Common JS -->
+<script src="{% static 'accounts/js/base.js' %}"></script>
 {% endblock %}
