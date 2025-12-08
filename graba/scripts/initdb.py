@@ -203,7 +203,6 @@ class ManageDB():
             # Adding user's auctions
             if role.type == 'SELLER':
                 self.init_table_auction(0, 20, seller)
-                print(seller)
 
         logger.info("Sample data created.")
     
