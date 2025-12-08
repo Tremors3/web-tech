@@ -1,12 +1,17 @@
+{% load static %}
+
 <!-- Search Form -->
 <form class="d-flex mx-auto w-100 justify-content-center" role="search" method="get" action="{% url 'core:home' %}"> <!-- url 'search' -->
     <div class="input-group w-75">
-        <select class="form-select" name="c">
-            <option value="">All</option>
-            <option value="category1">Category-1</option>
-            <option value="category2">Category-2</option>
-            <option value="category3">Category-3</option>
-            <!-- Insert the real categories -->
+        <select class="form-select" value="{{ request.GET.c }}" name="c" style="max-width: 150px; flex: 0 0 150px;">
+            <option value="ALL">All categories</option>
+            {% for cat in categories %}
+                <optgroup label="{{ cat.name }}">
+                    {% for sub in cat.subcategories.all %}
+                        <option value="{{ sub.name }}">{{ sub.name }}</option>
+                    {% endfor %}
+                </optgroup>
+            {% endfor %}
         </select>
         <input class="form-control" type="search" value="{{ request.GET.q }}" placeholder="Search auctions..." name="q" aria-label="Cerca">
         <button class="btn btn-outline-primary" type="submit">Search</button>

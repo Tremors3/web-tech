@@ -5,7 +5,7 @@
         "Smart Home Devices",
         "Cameras & Photography",
         "Audio & Headphones",
-        "Wearables (Smartwatches, Fitness Trackers)"
+        "Wearables"
     ],
     "Home & Living": [
         "Furniture",
@@ -14,14 +14,6 @@
         "Bedding & Bath",
         "Tools & DIY",
         "Lighting"
-    ],
-    "Fashion & Apparel": [
-        "Mens Clothing",
-        "Womens Clothing",
-        "Kids & Baby Clothing",
-        "Shoes",
-        "Bags & Accessories",
-        "Jewelry & Watches"
     ],
     "Grocery & Food": [
         "Beverages",
@@ -37,32 +29,11 @@
         "Team Sports Gear",
         "Outdoor Clothing"
     ],
-    "Health & Beauty": [
-        "Skincare",
-        "Haircare",
-        "Cosmetics & Makeup",
-        "Vitamins & Supplements",
-        "Personal Care"
-    ],
-    "Baby & Kids": [
-        "Toys",
-        "Baby Gear (strollers, car seats)",
-        "Educational Materials",
-        "Diapers & Wipes",
-        "Kids Furniture"
-    ],
     "Pets": [
         "Pet Food",
         "Toys & Accessories",
         "Grooming",
         "Pet Health Products"
-    ],
-    "Books, Media & Entertainment": [
-        "Books & eBooks",
-        "Movies & TV",
-        "Music",
-        "Video Games",
-        "Board Games"
     ],
     "Automotive": [
         "Car Accessories",

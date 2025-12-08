@@ -2,7 +2,7 @@ from django.views.generic import ListView
 from django.db.models import Q
 
 
-from auctions.models import Auction
+from auctions.models import Auction, Category
 from favorites.models import FavoriteAuction
 
 
@@ -21,8 +21,8 @@ class HomePageView(ListView):
             queryset = queryset.filter(title__icontains=q) | \
             queryset.filter(description__icontains=q)
 
-        # if c:
-        #     queryset = queryset.filter(category=c)
+        if c and c != "ALL":
+            queryset = queryset.filter(category__name=c)
 
         return queryset
 
@@ -42,5 +42,12 @@ class HomePageView(ListView):
             FavoriteAuction.objects.filter(user=self.request.user)
             .values_list('auction_id', flat=True)
         ) if self.request.user.is_authenticated else set()
+        
+        # Add categories and subcategories to the context
+        context["categories"] = (
+            Category.objects
+            .filter(level=1)
+            .prefetch_related("subcategories")
+        )
 
         return context
