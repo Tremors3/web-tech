@@ -86,6 +86,7 @@ class UserProfileDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(UserProfileDetailView, self).get_context_data(**kwargs)
 
+
         # Adding the profile user to the context (if exists)
         profile_user_pk = self.kwargs.get("pk")
         try:
@@ -100,9 +101,10 @@ class UserProfileDetailView(TemplateView):
         params._mutable = True
         params.pop('fav_page', None)
         params.pop('auc_page', None)
-
+        
         # Querystring clear for pagination
         context['querystring'] = params.urlencode()
+        
         
         # Add favorites to context ONLY if user is authenticated
         context['user_favorites'] = set(
@@ -111,18 +113,24 @@ class UserProfileDetailView(TemplateView):
         )
         
 
-        # --- FAVORITE AUCTIONS PAGINATION ---
+        # FAVORITE AUCTIONS PAGINATION
         fav_list = Auction.objects.filter(favoriteauction__user=user_obj)
         fav_page = self.request.GET.get("fav_page", 1)
 
         fav_paginator = Paginator(fav_list, 3)
         context["fav_page_obj"] = fav_paginator.get_page(fav_page)
         
-        # --- USER AUCTIONS PAGINATION ---
-        auc_list = Auction.objects.filter(seller_id=user_obj.id)
+        
+        # USER AUCTIONS PAGINATION
+        seller_instance = Seller.objects.filter(role__user=user_obj, role__type='SELLER').first()
+        if seller_instance:
+            auc_list = Auction.objects.filter(seller=seller_instance)
+        else:
+            auc_list = Auction.objects.none()   # Nessuna asta
         auc_page = self.request.GET.get("auc_page", 1)
-
+        
         auc_paginator = Paginator(auc_list, 3)
         context["auc_page_obj"] = auc_paginator.get_page(auc_page)
+
 
         return context

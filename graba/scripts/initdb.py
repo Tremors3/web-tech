@@ -138,7 +138,7 @@ class ManageDB():
                 auction.save()
     
     @transaction.atomic
-    def init_table_user(self, amount: int = 10):
+    def init_table_user(self, amount: int = 30):
         if amount < 0 or amount > 100: return
         
         # Adding the users
@@ -202,7 +202,8 @@ class ManageDB():
         
             # Adding user's auctions
             if role.type == 'SELLER':
-                self.init_table_auction(0, 15, seller)
+                self.init_table_auction(0, 20, seller)
+                print(seller)
 
         logger.info("Sample data created.")
     

@@ -18,32 +18,55 @@
 
         <h2 class="text-center mb-4">Profile Info</h2>
 
-        <!-- User Info -->
-        <div class="d-flex flex-column gap-3 mb-3">
+        <!-- PROFILE INFO - GRID -->
+        <div class="row">
+            
+            <!-- LEFT COLUMN -->
+            <div class="col-md-6 d-flex flex-column gap-3 mb-3">
 
-            <div class="d-flex align-items-center">
-                <strong class="me-3" style="width: 150px;">Username:</strong>
-                <span>{{ profile_user.username }}</span>
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Username:</strong>
+                    <span>{{ profile_user.username }}</span>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Email:</strong>
+                    <span>{{ profile_user.email }}</span>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Bio:</strong>
+                    <span>{{ profile_user.bio }}</span>
+                </div>
+
+                {% if profile_user.legal_type == "PRIVATE" %}
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Full Name:</strong>
+                    <span>{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
+                </div>
+                {% endif %}
             </div>
 
-            <div class="d-flex align-items-center">
-                <strong class="me-3" style="width: 150px;">Email:</strong>
-                <span>{{ profile_user.email }}</span>
-            </div>
+            <!-- RIGHT COLUMN -->
+            <div class="col-md-6 d-flex flex-column gap-3 mb-3">
 
-            <div class="d-flex align-items-center">
-                <strong class="me-3" style="width: 150px;">Bio:</strong>
-                <span>{{ profile_user.bio }}</span>
-            </div>
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Member Since:</strong>
+                    <span>{{ profile_user.registration_date|date }}</span>
+                </div>
 
-            <div class="d-flex align-items-center">
-                <strong class="me-3" style="width: 150px;">Full Name:</strong>
-                <span>{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">User Status:</strong>
+                    <span>{{ profile_user.state }}</span>
+                </div>
             </div>
+        </div> <!-- END GRID -->
 
-            {% if profile_user.legal_type == "SHOPKEEPER" %}
-                <!-- Shopkeeper Info -->
-                <hr>
+        <!-- SHOPKEEPER SECTION UNDER THE GRID -->
+        {% if profile_user.legal_type == "SHOPKEEPER" %}
+            <hr>
+            
+            <div class="col-md-6 d-flex flex-column gap-3 mb-3">
                 <h5>Shopkeeper Info</h5>
 
                 <div class="d-flex align-items-center">
@@ -52,7 +75,7 @@
                 </div>
 
                 <div class="d-flex align-items-center">
-                    <strong class="me-3" style="width: 150px;">Headquarters Address:</strong>
+                    <strong class="me-3" style="width: 150px;">Headquarters:</strong>
                     <span>{{ profile_user.shopkeeper.headquarters_address }}</span>
                 </div>
 
@@ -60,9 +83,9 @@
                     <strong class="me-3" style="width: 150px;">VAT Number:</strong>
                     <span>{{ profile_user.shopkeeper.iva_number }}</span>
                 </div>
-            {% endif %}
+            </div>
+        {% endif %}
 
-        </div>
     </div>
 
 
@@ -71,10 +94,12 @@
 
     <!-- SECOND SECTION: Vendor Auctions -->
     {% if auc_page_obj %}
-        <div class="card bg-white rounded shadow pt-4 px-4">
+        <div class="card bg-white rounded shadow pt-4 px-4 w-100">
             
             <!-- Section title -->
-            <h2 class="mb-4 text-left">Your Auctions</h2>
+            <h2 class="mb-4 text-left">
+                {% if request.user.is_authenticated and profile_user.id == request.user.id %}Your{% else %}Seller{% endif %} Auctions
+            </h2>
 
             <!-- Favourites -->
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -200,7 +225,7 @@
     <!-- THIRD SECTION: Favorites -->
     {% if request.user.is_authenticated and profile_user.id == request.user.id %}
         {% if fav_page_obj %}
-            <div class="card bg-white rounded shadow pt-4 px-4">
+            <div class="card bg-white rounded shadow pt-4 px-4 w-100">
                 
                 <!-- Section title -->
                 <h2 class="mb-4 text-left">Favorite Auctions</h2>
@@ -333,6 +358,7 @@
         <h2 class="text-center">Reviews</h2>
 
     </div>
+
 </div>
 {% endblock %}
 
