@@ -10,9 +10,7 @@
         {% csrf_token %}
         <button class="nav-link btn btn-link" type="submit">Logout</button>
     </form>
-    {% if  profile_user == request.user %}
-        <a class="nav-link" href="{% url 'accounts:edit' %}">Edit</a> <!-- TO REMOVE -->
-    {% endif %}
+    <a class="nav-link" href="{% url 'accounts:profile' request.user.id %}">Profile</a>
 {% else %}
     <!-- User is not logged -->
     <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>

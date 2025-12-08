@@ -1,0 +1,216 @@
+{% extends 'base/base_column.html' %}
+{% load static %}
+
+{% block navbar %} {% include 'accounts/includes/edit_navbar.html' %} {% endblock %}
+
+{% block title %}Edit Profile | Graba{% endblock %}
+
+{% block main_column %}
+<div class="d-flex flex-column align-items-center gap-4 pt-5">
+
+    <!-- FIRST SECTION -->
+    <div class="card col-10 col-md-8 col-lg-6 col-xl-5 bg-white rounded shadow gap-4 py-4 px-4">
+    
+        <h2 class="text-center">Edit Profile Info</h2>
+
+        <form method="post" id="profile-form" class="d-flex flex-column gap-4" novalidate>
+            {% csrf_token %}
+
+            <!-- Non Field Errors -->
+            {{ form.non_field_errors }}
+
+            <!-- User Fields -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Account Info</h5>
+                
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.email.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.username.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.bio.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.bio }}
+                        {{ form.bio.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Type (NOT editable, so hidden) -->
+            {{ form.legal_type.as_hidden }}
+
+            <!-- Private User Fields -->
+            {% if request.user.legal_type == "PRIVATE" %}
+            <div id="private-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>User Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.first_name.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.first_name }}
+                        {{ form.first_name.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.last_name.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.last_name }}
+                        {{ form.last_name.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.fiscal_code.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.fiscal_code }}
+                        {{ form.fiscal_code.errors }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Shopkeeper Fields -->
+            {% if request.user.legal_type == "SHOPKEEPER" %}
+            <div id="shopkeeper-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Shopkeeper Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.business_name.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.business_name }}
+                        {{ form.business_name.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.headquarters_address.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.headquarters_address }}
+                        {{ form.headquarters_address.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.iva_number.label_tag }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.iva_number }}
+                        {{ form.iva_number.errors }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Roles -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Roles</h5>
+    
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        {{ form.role_types }}
+                        {{ form.role_types.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buyer -->
+            <div id="buyer-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
+                
+                <h5>Buyer Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.shipping_address.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.shipping_address }}
+                        {{ form.shipping_address.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seller -->
+            <div id="seller-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
+                
+                <h5>Seller Info</h5>
+    
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.collection_address.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.collection_address }}
+                        {{ form.collection_address.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <p><strong>Note:</strong></p>
+                <ul>
+                    <li>If a role is not checked, it will be added automatically.</li>
+                    <li>If a role is unchecked, it will not be removed.</li>
+                </ul>
+            </div>
+
+            <!-- Buttons -->
+            <div>
+                <button type="button" id="enable-editing" class="btn btn-secondary w-100"> Enable Editing </button>
+                <button type="submit" id="save-btn" class="btn btn-primary w-100 d-none"> Save Changes </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Common JS -->
+<script src="{% static 'accounts/js/base.js' %}"></script>
+
+<!-- Custom JS -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* === ENABLE EDITING MODE === */
+        const form = document.getElementById("profile-form");
+        const enableBtn = document.getElementById("enable-editing");
+        const saveBtn = document.getElementById("save-btn");
+
+        const textFields = form.querySelectorAll("input[type='text'], input[type='email'], textarea");
+        const selectFields = form.querySelectorAll("select");
+        const checkboxFields = form.querySelectorAll("input[type='checkbox']");
+
+        // 1. Lock all fields
+        textFields.forEach(f => f.setAttribute("readonly", true));
+        selectFields.forEach(f => f.setAttribute("disabled", true));
+        checkboxFields.forEach(f => f.setAttribute("disabled", true));
+
+        // 2. Enable editing
+        enableBtn.addEventListener("click", function () {
+
+            // Unlock fields
+            textFields.forEach(f => f.removeAttribute("readonly"));
+            selectFields.forEach(f => f.removeAttribute("disabled"));
+            checkboxFields.forEach(f => f.removeAttribute("disabled"));
+
+            // Hide/Show buttons using Bootstrap classes
+            enableBtn.classList.add("d-none");
+            saveBtn.classList.remove("d-none");
+        });
+
+    });
+</script>
+{% endblock %}

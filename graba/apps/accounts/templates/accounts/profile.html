@@ -1,216 +1,362 @@
 {% extends 'base/base_column.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block navbar %} {% include 'accounts/includes/profile_navbar.html' %} {% endblock %}
 
-{% block title %}Edit Profile | Graba{% endblock %}
+{% block title %}Your Profile | Graba{% endblock %}
 
 {% block main_column %}
 <div class="d-flex flex-column align-items-center gap-4 pt-5">
 
-    <!-- FIRST SECTION -->
-    <div class="card col-10 col-md-8 col-lg-6 col-xl-5 bg-white rounded shadow gap-4 py-4 px-4">
-    
-        <h2 class="text-center">Edit Profile Info</h2>
 
-        <form method="post" id="profile-form" class="d-flex flex-column gap-4" novalidate>
-            {% csrf_token %}
 
-            <!-- Non Field Errors -->
-            {{ form.non_field_errors }}
 
-            <!-- User Fields -->
-            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
-                
-                <h5>Account Info</h5>
-                
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.email.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.email }}
-                        {{ form.email.errors }}
-                    </div>
-                </div>
 
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.username.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.username }}
-                        {{ form.username.errors }}
-                    </div>
-                </div>
+    <!-- FIRST SECTION: Profile Info -->
+    <div class="card bg-white rounded shadow pt-4 px-4 w-100">
 
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.bio.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.bio }}
-                        {{ form.bio.errors }}
-                    </div>
-                </div>
+        <h2 class="text-center mb-4">Profile Info</h2>
+
+        <!-- User Info -->
+        <div class="d-flex flex-column gap-3 mb-3">
+
+            <div class="d-flex align-items-center">
+                <strong class="me-3" style="width: 150px;">Username:</strong>
+                <span>{{ profile_user.username }}</span>
             </div>
 
-            <!-- Legal Type (NOT editable, so hidden) -->
-            {{ form.legal_type.as_hidden }}
-
-            <!-- Private User Fields -->
-            {% if request.user.legal_type == "PRIVATE" %}
-            <div id="private-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
-                
-                <h5>User Info</h5>
-    
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.first_name.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.first_name }}
-                        {{ form.first_name.errors }}
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.last_name.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.last_name }}
-                        {{ form.last_name.errors }}
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.fiscal_code.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.fiscal_code }}
-                        {{ form.fiscal_code.errors }}
-                    </div>
-                </div>
+            <div class="d-flex align-items-center">
+                <strong class="me-3" style="width: 150px;">Email:</strong>
+                <span>{{ profile_user.email }}</span>
             </div>
-            {% endif %}
 
-            <!-- Shopkeeper Fields -->
-            {% if request.user.legal_type == "SHOPKEEPER" %}
-            <div id="shopkeeper-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
-                
+            <div class="d-flex align-items-center">
+                <strong class="me-3" style="width: 150px;">Bio:</strong>
+                <span>{{ profile_user.bio }}</span>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <strong class="me-3" style="width: 150px;">Full Name:</strong>
+                <span>{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
+            </div>
+
+            {% if profile_user.legal_type == "SHOPKEEPER" %}
+                <!-- Shopkeeper Info -->
+                <hr>
                 <h5>Shopkeeper Info</h5>
-    
+
                 <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.business_name.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.business_name }}
-                        {{ form.business_name.errors }}
-                    </div>
+                    <strong class="me-3" style="width: 150px;">Business Name:</strong>
+                    <span>{{ profile_user.shopkeeper.business_name }}</span>
                 </div>
 
                 <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.headquarters_address.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.headquarters_address }}
-                        {{ form.headquarters_address.errors }}
-                    </div>
+                    <strong class="me-3" style="width: 150px;">Headquarters Address:</strong>
+                    <span>{{ profile_user.shopkeeper.headquarters_address }}</span>
                 </div>
 
                 <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.iva_number.label_tag }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.iva_number }}
-                        {{ form.iva_number.errors }}
-                    </div>
+                    <strong class="me-3" style="width: 150px;">VAT Number:</strong>
+                    <span>{{ profile_user.shopkeeper.iva_number }}</span>
                 </div>
-            </div>
             {% endif %}
 
-            <!-- Roles -->
-            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
-                
-                <h5>Roles</h5>
-    
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        {{ form.role_types }}
-                        {{ form.role_types.errors }}
+        </div>
+    </div>
+
+
+
+
+
+    <!-- SECOND SECTION: Vendor Auctions -->
+    {% if auc_page_obj %}
+        <div class="card bg-white rounded shadow pt-4 px-4">
+            
+            <!-- Section title -->
+            <h2 class="mb-4 text-left">Your Auctions</h2>
+
+            <!-- Favourites -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for auc in auc_page_obj %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+
+                            <!-- CARD TOP -->
+                            <div class="position-relative">
+
+                                <!-- RESIZED IMAGE -->
+                                {% if auc.image_url %}
+                                    <img src="{{ auc.image_url }}" class="card-img-top"
+                                        alt="{{ auc.title }}"
+                                        style="width:100%; height:200px; object-fit:contain; background-color:#f8f9fa;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top" alt="No Image">
+                                {% endif %}
+
+                                <!-- BOOKMARK ICON -->
+                                {% if request.user.is_authenticated %}
+                                    <div class="favorite-toggle"
+                                        data-auction="{{ auc.id }}"
+                                        style="position:absolute; top:10px; right:10px; cursor:pointer;">
+                                        
+                                        {% if auc.id in user_favorites %}
+                                            <i class="bi bi-bookmark-fill text-dark"></i>
+                                        {% else %}
+                                            <i class="bi bi-bookmark text-dark"></i>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- CARD BODY -->
+                            <div class="card-body">
+                                <h5 class="card-title">{{ auc.title|truncatewords:10 }}</h5>
+                                <p class="card-text">{{ auc.description|truncatewords:20 }}</p>
+                            </div>
+
+                            <!-- CARD FOOTER -->
+                            <div class="card-footer bg-white border-0 py-2 px-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex flex-column">
+                                        {% if auc.has_offers %}
+                                            <span class="badge bg-warning mb-1">
+                                                Current offer: € {{ auc.get_highest_offer_value|cents_to_price }}
+                                            </span>
+                                        {% else %}
+                                            {% if auc.min_price_cents %}
+                                                <span class="badge bg-primary mb-1">
+                                                    Starting at: € {{ auc.min_price_cents|cents_to_price }}
+                                                </span>
+                                            {% endif %}
+                                            {% if auc.buy_now_price_cents %}
+                                                <span class="badge bg-success mb-1">
+                                                    Buy-now: € {{ auc.buy_now_price_cents|cents_to_price }}
+                                                </span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'core:home' %}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a> <!-- url 'core:auction_detail' auction.id -->
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
             </div>
 
-            <!-- Buyer -->
-            <div id="buyer-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
-                
-                <h5>Buyer Info</h5>
-    
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.shipping_address.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.shipping_address }}
-                        {{ form.shipping_address.errors }}
-                    </div>
-                </div>
-            </div>
 
-            <!-- Seller -->
-            <div id="seller-fields" class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3 d-none">
-                
-                <h5>Seller Info</h5>
-    
-                <div class="d-flex align-items-center">
-                    <label class="me-3" style="width: 150px;">{{ form.collection_address.label }}</label>
-                    <div class="flex-grow-1">
-                        {{ form.collection_address }}
-                        {{ form.collection_address.errors }}
-                    </div>
-                </div>
-            </div>
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-3">
+                <ul class="pagination justify-content-center">
 
-            <div>
-                <p><strong>Note:</strong></p>
-                <ul>
-                    <li>If a role is not checked, it will be added automatically.</li>
-                    <li>If a role is unchecked, it will not be removed.</li>
+                    <!-- Previous -->
+                    {% if auc_page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}auc_page={{ auc_page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                    {% endif %}
+                    
+                    <!-- Range -->
+                    {% for num in auc_page_obj.paginator.page_range %}
+                        {% if auc_page_obj.number == num %}
+                            <!-- Shows the current page -->
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num >= auc_page_obj.number|add:'-2' and num <= auc_page_obj.number|add:'2' %}
+                            <!-- Shows only 2 pages before and after the current one -->
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}auc_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% elif num == 1 or num == auc_page_obj.paginator.num_pages %}
+                            <!-- Shows the first and last page -->
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}auc_page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Next -->
+                    {% if auc_page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}auc_page={{ auc_page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                    {% endif %}
                 </ul>
-            </div>
+            </nav>
+        </div>
+    {% endif %}
 
-            <!-- Buttons -->
-            <div>
-                <button type="button" id="enable-editing" class="btn btn-secondary w-100"> Enable Editing </button>
-                <button type="submit" id="save-btn" class="btn btn-primary w-100 d-none"> Save Changes </button>
-            </div>
 
-        </form>
+
+
+
+    <!-- THIRD SECTION: Favorites -->
+    {% if request.user.is_authenticated and profile_user.id == request.user.id %}
+        {% if fav_page_obj %}
+            <div class="card bg-white rounded shadow pt-4 px-4">
+                
+                <!-- Section title -->
+                <h2 class="mb-4 text-left">Favorite Auctions</h2>
+
+                <!-- Favourites -->
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for fav in fav_page_obj %}
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+
+                                <!-- CARD TOP -->
+                                <div class="position-relative">
+
+                                    <!-- RESIZED IMAGE -->
+                                    {% if fav.image_url %}
+                                        <img src="{{ fav.image_url }}" class="card-img-top"
+                                            alt="{{ fav.title }}"
+                                            style="width:100%; height:200px; object-fit:contain; background-color:#f8f9fa;">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top" alt="No Image">
+                                    {% endif %}
+
+                                    <!-- BOOKMARK ICON -->
+                                    {% if request.user.is_authenticated %}
+                                        <div class="favorite-toggle"
+                                            data-auction="{{ fav.id }}"
+                                            style="position:absolute; top:10px; right:10px; cursor:pointer;">
+                                            
+                                            {% if fav.id in user_favorites %}
+                                                <i class="bi bi-bookmark-fill text-dark"></i>
+                                            {% else %}
+                                                <i class="bi bi-bookmark text-dark"></i>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+
+                                <!-- CARD BODY -->
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ fav.title|truncatewords:10 }}</h5>
+                                    <p class="card-text">{{ fav.description|truncatewords:20 }}</p>
+                                </div>
+
+                                <!-- CARD FOOTER -->
+                                <div class="card-footer bg-white border-0 py-2 px-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex flex-column">
+                                            {% if fav.has_offers %}
+                                                <span class="badge bg-warning mb-1">
+                                                    Current offer: € {{ fav.get_highest_offer_value|cents_to_price }}
+                                                </span>
+                                            {% else %}
+                                                {% if fav.min_price_cents %}
+                                                    <span class="badge bg-primary mb-1">
+                                                        Starting at: € {{ fav.min_price_cents|cents_to_price }}
+                                                    </span>
+                                                {% endif %}
+                                                {% if fav.buy_now_price_cents %}
+                                                    <span class="badge bg-success mb-1">
+                                                        Buy-now: € {{ fav.buy_now_price_cents|cents_to_price }}
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                        <a href="{% url 'core:home' %}" class="btn btn-sm btn-outline-primary">
+                                            View
+                                        </a> <!-- url 'core:auction_detail' auction.id -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-3">
+                    <ul class="pagination justify-content-center">
+
+                        <!-- Previous -->
+                        {% if fav_page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}fav_page={{ fav_page_obj.previous_page_number }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                        {% endif %}
+                        
+                        <!-- Range -->
+                        {% for num in fav_page_obj.paginator.page_range %}
+                            {% if fav_page_obj.number == num %}
+                                <!-- Shows the current page -->
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% elif num >= fav_page_obj.number|add:'-2' and num <= fav_page_obj.number|add:'2' %}
+                                <!-- Shows only 2 pages before and after the current one -->
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}fav_page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% elif num == 1 or num == fav_page_obj.paginator.num_pages %}
+                                <!-- Shows the first and last page -->
+                                <li class="page-item">
+                                    <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}fav_page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <!-- Next -->
+                        {% if fav_page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}fav_page={{ fav_page_obj.next_page_number }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Next</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+
+
+
+    <!-- FOURTH SECTION: Vendor Reviews -->
+    <div class="card bg-white rounded shadow pt-4 px-4 w-100">
+
+        <h2 class="text-center">Reviews</h2>
+
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<!-- Common JS -->
-<script src="{% static 'accounts/js/base.js' %}"></script>
-
-<!-- Custom JS -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    /* Ajax call to toggle favorites */
+    document.querySelectorAll('.favorite-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const auctionId = btn.dataset.auction;
 
-        /* === ENABLE EDITING MODE === */
-        const form = document.getElementById("profile-form");
-        const enableBtn = document.getElementById("enable-editing");
-        const saveBtn = document.getElementById("save-btn");
+            fetch(`/favorites/${auctionId}/toggle/`)
+                .then(response => response.json())
+                .then(data => {
+                    const icon = btn.querySelector('i');
 
-        const textFields = form.querySelectorAll("input[type='text'], input[type='email'], textarea");
-        const selectFields = form.querySelectorAll("select");
-        const checkboxFields = form.querySelectorAll("input[type='checkbox']");
-
-        // 1. Lock all fields
-        textFields.forEach(f => f.setAttribute("readonly", true));
-        selectFields.forEach(f => f.setAttribute("disabled", true));
-        checkboxFields.forEach(f => f.setAttribute("disabled", true));
-
-        // 2. Enable editing
-        enableBtn.addEventListener("click", function () {
-
-            // Unlock fields
-            textFields.forEach(f => f.removeAttribute("readonly"));
-            selectFields.forEach(f => f.removeAttribute("disabled"));
-            checkboxFields.forEach(f => f.removeAttribute("disabled"));
-
-            // Hide/Show buttons using Bootstrap classes
-            enableBtn.classList.add("d-none");
-            saveBtn.classList.remove("d-none");
+                    if (data.favorite) {
+                        icon.classList.remove('bi-bookmark');
+                        icon.classList.add('bi-bookmark-fill');
+                    } else {
+                        icon.classList.remove('bi-bookmark-fill');
+                        icon.classList.add('bi-bookmark');
+                    }
+                });
         });
-
     });
 </script>
 {% endblock %}
