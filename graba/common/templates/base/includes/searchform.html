@@ -1,19 +1,27 @@
 {% load static %}
 
 <!-- Search Form -->
-<form class="d-flex mx-auto w-100 justify-content-center" role="search" method="get" action="{% url 'core:home' %}"> <!-- url 'search' -->
+<form class="d-flex mx-auto w-100 justify-content-center" role="search" method="get" action="{% url 'core:home' %}">
     <div class="input-group w-75">
+
+        <!-- Category Selection -->
         <select class="form-select" value="{{ request.GET.c }}" name="c" style="max-width: 150px; flex: 0 0 150px;">
-            <option value="ALL">All categories</option>
+            
+            <option value="ALL" {% if request.GET.c == "ALL" %}selected{% endif %}>All categories</option>
+            
             {% for cat in categories %}
                 <optgroup label="{{ cat.name }}">
                     {% for sub in cat.subcategories.all %}
-                        <option value="{{ sub.name }}">{{ sub.name }}</option>
+                        <option value="{{ sub.name }}" {% if request.GET.c == sub.name %}selected{% endif %}>{{ sub.name }}</option>
                     {% endfor %}
                 </optgroup>
             {% endfor %}
         </select>
+        
+        <!-- Query Input Field -->
         <input class="form-control" type="search" value="{{ request.GET.q }}" placeholder="Search auctions..." name="q" aria-label="Cerca">
+
+        <!-- Search Button -->
         <button class="btn btn-outline-primary" type="submit">Search</button>
     </div>
 </form>
