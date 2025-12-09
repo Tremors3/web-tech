@@ -23,3 +23,41 @@
 .bg-dark-2-custom {
     background-color: #263238 !important;
 }
+
+/* CARD TITLE UNDERILINE
+*/
+
+.no-underline-on-hover {
+    text-decoration: none; /* senza underline */
+}
+
+.no-underline-on-hover:hover {
+    text-decoration: underline; /* underline solo su hover */
+}
+
+/* FAVORITE TOGGLE ICON
+*/
+
+.favorite-toggle {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8); /* bianco semi-trasparente */
+    backdrop-filter: blur(4px); /* effetto vetro carino */
+    border: 1px solid #ddd;
+
+    transition: background 0.2s, border 0.2s;
+}
+
+.favorite-toggle:hover {
+    background: white;
+    border-color: #bbb;
+}
+
+.favorite-toggle i {
+    font-size: 18px;
+}

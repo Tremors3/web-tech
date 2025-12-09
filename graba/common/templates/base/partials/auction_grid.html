@@ -1,0 +1,118 @@
+{% load static %}
+{% load custom_filters %}
+
+<div class="card bg-white rounded shadow pt-4 px-4 w-100">
+
+    <!-- Section title -->
+    <h2 class="mb-4 text-left">{{ title }}</h2>
+
+    <!-- Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+        {% for auction in page_obj %}
+
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+
+                    <!-- CARD TOP -->
+                    <div class="position-relative">
+
+                        <!-- RESIZED IMAGE -->
+                        <a href="{% url 'core:home' %}"> <!-- url 'core:auction_detail' auction.id -->
+                            {% if auction.image_url %}
+                                <img src="{{ auction.image_url }}" class="card-img-top" alt="{{ auction.title }}"
+                                    style="width:100%; height:200px; object-fit:contain; background-color:#f8f9fa;">
+                            {% else %}
+                                <img src="https://via.placeholder.com/400x250?text=No+Image" class="card-img-top" alt="No Image">
+                            {% endif %}
+                        </a>
+                        
+                        <!-- BOOKMARK ICON -->
+                        {% if request.user.is_authenticated %}
+                            <div class="favorite-toggle"
+                                data-auction="{{ auction.id }}"
+                                style="position:absolute; top:10px; right:10px; cursor:pointer;">
+                                
+                                {% if auction.id in user_favorites %}
+                                    <i class="bi bi-bookmark-fill text-dark"></i>
+                                {% else %}
+                                    <i class="bi bi-bookmark text-dark"></i>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    <!-- CARD BODY -->
+                    <div class="card-body">
+                        <a href="{% url 'core:home' %}"
+                            class="link-dark no-underline-on-hover">
+                            <h5 class="card-title">{{ auction.title|truncatewords:10 }}</h5>
+                        </a>
+                        <p class="card-text">{{ auction.description|truncatewords:20 }}</p>
+                    </div>
+
+                    <!-- CARD FOOTER -->
+                    <div class="card-footer bg-white border-0 py-3 px-3">
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <!-- LEFT SIDE: PRICE INFO -->
+                            <div class="d-flex flex-column align-items-center gap-2">
+
+                                {% if auction.has_offers %}
+                                    <span class="badge text-dark border shadow-sm d-flex align-items-center align-self-stretch px-3 py-2 gap-2">
+                                        <small>Current offer:</small>
+                                        <span class="fs-5 fw-semibold">
+                                            € {{ auction.get_highest_offer_value|cents_to_price }}
+                                        </span>
+                                    </span>
+                                {% else %}
+                                    {% if auction.min_price_cents %}
+                                        <span class="badge text-dark border shadow-sm d-flex align-items-center align-self-stretch px-3 py-2 gap-2">
+                                            <small>Starting at:</small>
+                                            <span class="fs-5 fw-semibold">
+                                                € {{ auction.min_price_cents|cents_to_price }}
+                                            </span>
+                                        </span>
+                                    {% endif %}
+
+                                    {% if auction.buy_now_price_cents %}
+                                        <span class="badge text-dark border shadow-sm d-flex align-items-center align-self-stretch px-3 py-2 gap-2">
+                                            <small>Buy now:</small>
+                                            <span class="fs-5 fw-semibold">
+                                                € {{ auction.buy_now_price_cents|cents_to_price }}
+                                            </span>
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <!-- RIGHT SIDE: OFFERS + VIEW BUTTON -->
+                            <div class="d-flex flex-column align-items-center gap-2">
+                                <span class="badge text-dark border bg-light shadow-sm align-self-stretch px-3 py-2">
+                                    {{ auction.get_offers_number }} offers
+                                </span>
+                                
+                                <span class="badge text-dark border bg-light shadow-sm align-self-stretch px-3 py-2">
+                                    {{ auction.ftime_left }}
+                                </span>
+                                
+                                <!--<a href="{% url 'core:home' %}"
+                                class="btn btn-sm btn-outline-primary shadow-sm align-self-stretch">
+                                    View
+                                </a>--> <!-- url 'core:auction_detail' auction.id -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        {% endfor %}
+        
+    </div>
+
+    <!-- Pagination -->
+    {% include "base/partials/pagination.html" with page_obj=page_obj querystring=querystring %}
+
+</div>

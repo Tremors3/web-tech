@@ -55,6 +55,25 @@ class Auction(models.Model):
             highest=models.Max('amount_cents')
         )['highest']
     
+    @property
+    def ftime_left(self):
+        current_date = timezone.now()
+
+        if (current_date > self.end_date):
+            return 'Ended'
+
+        diff = self.end_date - current_date
+        remaining_seconds = diff.seconds
+
+        days = diff.days
+        hours, remaining_seconds = divmod(remaining_seconds, 3600)
+        minutes, seconds = divmod(remaining_seconds, 60)
+
+        if days: return f'{days}d {hours}h'
+        if hours: return f'{hours}h {minutes}m'
+        if minutes: return f'{minutes}m {seconds}s'
+        return f'{seconds}s'
+    
     def __str__(self):
         return self.title
 
