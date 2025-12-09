@@ -35,6 +35,10 @@
                     <strong class="me-3" style="width: 150px;">Bio:</strong>
                     <span>{{ profile_user.bio }}</span>
                 </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-md-6 d-flex flex-column gap-3 mb-3">
 
                 {% if profile_user.legal_type == "PRIVATE" %}
                 <div class="d-flex align-items-center">
@@ -42,10 +46,6 @@
                     <span>{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
                 </div>
                 {% endif %}
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div class="col-md-6 d-flex flex-column gap-3 mb-3">
 
                 <div class="d-flex align-items-center">
                     <strong class="me-3" style="width: 150px;">Member Since:</strong>
