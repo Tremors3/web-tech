@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.contrib.auth import authenticate, login
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic import TemplateView
@@ -12,6 +13,7 @@ from django.http import Http404
 from .forms import UserRegistrationForm, CustomLoginForm, UserProfileForm
 from .models import User, Role, Buyer, Seller, Private, Shopkeeper
 from .mixins import RedirectAuthenticatedUserMixin
+
 from auctions.models import Auction
 from favorites.models import FavoriteAuction
 
@@ -19,12 +21,13 @@ from favorites.models import FavoriteAuction
 class UserRegisterView(RedirectAuthenticatedUserMixin, FormView):
     template_name = 'accounts/signin.html'
     form_class = UserRegistrationForm
-    success_url = reverse_lazy('accounts:login')
+    success_url = reverse_lazy('core:home')
 
     def form_valid(self, form):
+        
         with transaction.atomic():
-            user = form.save(commit=False)
-            user.save()
+            
+            user = form.save(commit=True)
 
             # Create the selected roles
             for role_type in form.cleaned_data['role_types']:
@@ -42,7 +45,7 @@ class UserRegisterView(RedirectAuthenticatedUserMixin, FormView):
                         collection_address=form.cleaned_data['collection_address']
                     )
 
-            # Create Private or Shopkeeper user
+            # Create private or shopkeeper profile
             if user.legal_type == 'PRIVATE':
                 Private.objects.create(
                     user=user,
@@ -57,7 +60,17 @@ class UserRegisterView(RedirectAuthenticatedUserMixin, FormView):
                     iva_number=form.cleaned_data['iva_number'],
                     headquarters_address=form.cleaned_data['headquarters_address']
                 )
-        
+
+        # User automatic authentication
+        auth_user = authenticate(
+            self.request,
+            email=form.cleaned_data['email'],
+            password=form.cleaned_data['password1'],
+        )
+
+        if auth_user:
+            login(self.request, auth_user)
+
         return super().form_valid(form)
 
 
