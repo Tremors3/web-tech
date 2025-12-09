@@ -8,10 +8,6 @@
 {% block navbar_custom_links %}
     {% if request.user.is_authenticated %}
         <!-- User is logged -->
-        <form method="post" action="{% url 'accounts:logout' %}">
-            {% csrf_token %}
-            <button class="nav-link btn btn-link" type="submit">Logout</button>
-        </form>
         <a class="nav-link" href="{% url 'accounts:profile' request.user.id %}">Profile</a>
     {% else %}
         <!-- User is not logged -->
