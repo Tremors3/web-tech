@@ -88,22 +88,16 @@
 
     <!-- SECOND SECTION: Vendor Auctions -->
     {% if auc_page_obj %}
-        {% if request.user.is_authenticated and profile_user.id == request.user.id %}
-            {% with "Your Auctions" as auctions_title %}
-                {% include "partials/auction_grid.html" with request=request page_obj=auc_page_obj title=auctions_title querystring=querystring user_favorites=user_favorites %}
-            {% endwith %}
-        {% else %}
-            {% with "Seller Auctions" as auctions_title %}
-                {% include "partials/auction_grid.html" with request=request page_obj=auc_page_obj title=auctions_title querystring=querystring user_favorites=user_favorites %}
-            {% endwith %}
-        {% endif %}
+        {% with "Seller Auctions" as auctions_title %}
+            {% include "partials/auction_grid.html" with request=request page_obj=auc_page_obj title=auctions_title querystring=querystring user_favorites=user_favorites page_arg_name="auc_page" only %}
+        {% endwith %}
     {% endif %}
 
-
+    
     <!-- THIRD SECTION: Favorites -->
     {% if request.user.is_authenticated and profile_user.id == request.user.id %}
         {% if fav_page_obj %}
-            {% include "partials/auction_grid.html" with request=request page_obj=fav_page_obj title="Favorite Auctions" querystring=querystring user_favorites=user_favorites only %}
+            {% include "partials/auction_grid.html" with request=request page_obj=fav_page_obj title="Favorite Auctions" querystring=querystring user_favorites=user_favorites page_arg_name="fav_page" only %}
         {% endif %}
     {% endif %}
 

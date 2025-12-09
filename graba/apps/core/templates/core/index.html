@@ -29,7 +29,7 @@
     <!-- SECOND SECTION -->
     {% if auctions %}
 
-        {% include "base/partials/auction_grid.html" with request=request page_obj=page_obj title="Profile Info" querystring=querystring user_favorites=user_favorites only %}
+        {% include "base/partials/auction_grid.html" with request=request page_obj=page_obj title="Profile Info" querystring=querystring user_favorites=user_favorites page_arg_name="page" only %}
         
     {% else %}
         <div class="card bg-white rounded shadow pt-4 px-4 w-100">

@@ -6,7 +6,7 @@
         <!-- Previous -->
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}{{page_arg_name}}={{ page_obj.previous_page_number }}">Previous</a>
             </li>
         {% else %}
             <li class="page-item disabled"><span class="page-link">Previous</span></li>
@@ -20,12 +20,12 @@
             {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
                 <!-- Shows only 2 pages before and after the current one -->
                 <li class="page-item">
-                    <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}{{page_arg_name}}={{ num }}">{{ num }}</a>
                 </li>
             {% elif num == 1 or num == page_obj.paginator.num_pages %}
                 <!-- Shows the first and last page -->
                 <li class="page-item">
-                    <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}{{page_arg_name}}={{ num }}">{{ num }}</a>
                 </li>
             {% endif %}
         {% endfor %}
@@ -33,7 +33,7 @@
         <!-- Next -->
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                <a class="page-link" href="?{% if querystring %}{{ querystring }}&{% endif %}{{page_arg_name}}={{ page_obj.next_page_number }}">Next</a>
             </li>
         {% else %}
             <li class="page-item disabled"><span class="page-link">Next</span></li>
