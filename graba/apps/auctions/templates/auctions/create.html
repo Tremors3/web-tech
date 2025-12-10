@@ -131,20 +131,35 @@
                     </div>
                 {% endif %}
 
-                <!-- Buy Now Price -->
-                <div class="d-flex align-items-center gap-2">
-                    <label class="me-3" style="width: 150px;">Buy now price</label>
-                    {{ form.buy_now_price_eur }}
-                    <span>€</span>
-                    {{ form.buy_now_price_cents }}
-                    <span>cents</span>
+                <!-- Enable Buy Now Price -->
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">Enable Buy Now</label>
+                    <div class="flex-grow-1">
+                        {{ form.enable_buy_now_price }}
+                    </div>
                 </div>
-                {% if form.buy_now_price_eur.errors or form.buy_now_price_cents.errors %}
+                {% if form.enable_buy_now_price.errors %}
                     <div class="alert alert-danger list-icon list-icon-error">
-                        {{ form.buy_now_price_eur.errors }}
-                        {{ form.buy_now_price_cents.errors }}
+                        {{ form.enable_buy_now_price.errors }}
                     </div>
                 {% endif %}
+
+                <!-- Buy Now Price -->
+                <div id="buyNowFields">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="me-3" style="width: 150px;">Buy now price</label>
+                        {{ form.buy_now_price_eur }}
+                        <span>€</span>
+                        {{ form.buy_now_price_cents }}
+                        <span>cents</span>
+                    </div>
+                    {% if form.buy_now_price_eur.errors or form.buy_now_price_cents.errors %}
+                        <div class="alert alert-danger list-icon list-icon-error">
+                            {{ form.buy_now_price_eur.errors }}
+                            {{ form.buy_now_price_cents.errors }}
+                        </div>
+                    {% endif %}
+                </div>
 
             </div>
 
@@ -208,6 +223,30 @@ document.addEventListener('DOMContentLoaded', () => {
             field.value = val;
         });
     });
+
+    /* Helpers */
+    function show(el) {
+        el?.classList.remove("d-none");
+    }
+
+    function hide(el) {
+        el?.classList.add("d-none");
+    }
+
+    /* === BUY NOW PRICE === */
+    const enableBuyNowPriceCheckbox = document.getElementById("id_enable_buy_now_price");
+    const buyNowFields = document.getElementById("buyNowFields");
+
+    function toggleBuyNowField() {
+        if (enableBuyNowPriceCheckbox.checked) {
+            show(buyNowFields);
+        } else {
+            hide(buyNowFields);
+        }
+    }
+
+    enableBuyNowPriceCheckbox.addEventListener("change", toggleBuyNowField);
+    toggleBuyNowField(); // run on page load
 
 });
 </script>

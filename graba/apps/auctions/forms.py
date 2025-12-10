@@ -13,6 +13,9 @@ class AuctionForm(forms.ModelForm):
     buy_now_price_eur = forms.IntegerField(min_value=0, initial=0, widget=forms.NumberInput(attrs={"style": "width: 164px;"}))
     buy_now_price_cents = forms.IntegerField(min_value=0, max_value=99, initial=1)
     
+    # Buy now price enable checbox
+    enable_buy_now_price = forms.BooleanField(required=False, widget=forms.CheckboxInput())
+    
     class Meta:
         model = Auction
         fields = [
@@ -49,12 +52,18 @@ class AuctionForm(forms.ModelForm):
             cleaned_data['min_price_cents'] = eur * 100 + cents
         
         # Convert Euro + Cents (buy_now_price)
-        eur_bn = cleaned_data.get('buy_now_price_eur')
-        cents_bn = cleaned_data.get('buy_now_price_cents')
-        if eur_bn is None or cents_bn is None:
-            self.add_error('buy_now_price_cents', "Insert valid euro and cent values.")
+        enable_buy = cleaned_data.get('enable_buy_now_price')
+        if enable_buy:
+            # When Buy Now is enabled
+            eur_bn = cleaned_data.get('buy_now_price_eur')
+            cents_bn = cleaned_data.get('buy_now_price_cents')
+            if eur_bn is None or cents_bn is None:
+                self.add_error('buy_now_price_cents', "Insert valid euro and cent values.")
+            else:
+                cleaned_data['buy_now_price_cents'] = eur_bn * 100 + cents_bn
         else:
-            cleaned_data['buy_now_price_cents'] = eur_bn * 100 + cents_bn
+            # When Buy Now is enabled
+            cleaned_data['buy_now_price_cents'] = None
         
         # Other validations
         min_price = cleaned_data.get('min_price_cents')
@@ -65,14 +74,16 @@ class AuctionForm(forms.ModelForm):
             self.add_error("end_date", "End date must be later than start date.")
 
         # Price validation
-        if min_price is not None and min_price <= 0:
+        if min_price is None:
+            self.add_error("min_price_cents", "Minimum price must be specified.")
+
+        if min_price <= 0:
             self.add_error("min_price_cents", "Minimum price must be greater than zero.")
 
-        if buy_now is not None and min_price is not None and buy_now < min_price:
+        if buy_now is not None and buy_now < min_price:
             self.add_error(
                 "buy_now_price_cents",
                 "Buy Now price cannot be lower than the minimum price."
             )
 
         return cleaned_data
-
