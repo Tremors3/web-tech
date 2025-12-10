@@ -15,12 +15,6 @@ class AuctionCreateView(SellerRequiredMixin, CreateView):
 
     def form_valid(self, form):
         auction = form.instance
-
-        # Euros to cents conversion
-        auction.min_price_cents = int(form.cleaned_data['min_price_eur'] * 100)
-        buy_now = form.cleaned_data.get('buy_now_price_eur')
-        auction.buy_now_price_cents = int(buy_now * 100) if buy_now else None
-
         user = self.request.user
 
         # Get the active Seller Role
