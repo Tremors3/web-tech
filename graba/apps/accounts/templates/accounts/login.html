@@ -17,7 +17,11 @@
             {% csrf_token %}
 
             <!-- Non Field Errors -->
-            {{ form.non_field_errors }}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger list-icon list-icon-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
 
             <!-- Login Fields -->
             <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
@@ -26,17 +30,25 @@
                     <label class="me-3" style="width: 150px;">{{ form.username.label }}</label>
                     <div class="flex-grow-1">
                         {{ form.username }}
-                        {{ form.username.errors }}
                     </div>
                 </div>
+                {% if form.username.errors %}
+                    <div class="alert alert-danger list-icon list-icon-error">
+                        {{ form.username.errors }}
+                    </div>
+                {% endif %}
 
                 <div class="d-flex align-items-center">
                     <label class="me-3" style="width: 150px;">{{ form.password.label }}</label>
                     <div class="flex-grow-1">
                         {{ form.password }}
-                        {{ form.password.errors }}
                     </div>
                 </div>
+                {% if form.password.errors %}
+                    <div class="alert alert-danger list-icon list-icon-error">
+                        {{ form.password.errors }}
+                    </div>
+                {% endif %}
             </div>
 
             <!-- Buttons -->

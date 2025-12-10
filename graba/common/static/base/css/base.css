@@ -61,3 +61,41 @@
 .favorite-toggle i {
     font-size: 18px;
 }
+
+/* LIST ICONS
+*/
+
+.list-icon ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-icon li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.list-icon-error li::before, .list-icon-warning li::before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* ERROR LIST ICON
+*/
+
+.list-icon-error li::before { 
+    background-image: url('../images/icons/error-16x16.png');
+}
+
+/* WARNING LIST ICON
+*/
+
+.list-icon-warning li::before {    
+    background-image: url('../images/icons/warning-16x16.png');
+}

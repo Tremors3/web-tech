@@ -39,36 +39,40 @@ class AuctionForm(forms.ModelForm):
 
         start = cleaned_data.get("start_date")
         end = cleaned_data.get("end_date")
-        
-        # Price in cents = eur * 100 + cents
-        min_price_eur_only = cleaned_data.get('min_price_eur', 0)
-        min_price_cents_only = cleaned_data.get('min_price_cents', 0)
-        cleaned_data['min_price_cents'] = min_price_eur_only * 100 + min_price_cents_only
-        
-        # Price in cents = eur * 100 + cents
-        buy_now_price_eur_only = cleaned_data.get('buy_now_price_eur')
-        buy_now_price_cents_only = cleaned_data.get('buy_now_price_cents')
-        cleaned_data['buy_now_price_cents'] = buy_now_price_eur_only * 100 + buy_now_price_cents_only
 
+        # Convert Euro + Cents (min_price)
+        eur = cleaned_data.get('min_price_eur')
+        cents = cleaned_data.get('min_price_cents')
+        if eur is None or cents is None:
+            self.add_error('min_price_cents', "Insert valid euro and cent values.")
+        else:
+            cleaned_data['min_price_cents'] = eur * 100 + cents
+        
+        # Convert Euro + Cents (buy_now_price)
+        eur_bn = cleaned_data.get('buy_now_price_eur')
+        cents_bn = cleaned_data.get('buy_now_price_cents')
+        if eur_bn is None or cents_bn is None:
+            self.add_error('buy_now_price_cents', "Insert valid euro and cent values.")
+        else:
+            cleaned_data['buy_now_price_cents'] = eur_bn * 100 + cents_bn
+        
+        # Other validations
         min_price = cleaned_data.get('min_price_cents')
         buy_now = cleaned_data.get('buy_now_price_cents')
 
-        # 1) end_date needs to be after start_date
+        # Date validation
         if start and end and end <= start:
-            raise ValidationError(
-                {"end_date": "End date must be later than the start date."}
-            )
+            self.add_error("end_date", "End date must be later than start date.")
 
-        # 2) min_price needs to be positive
+        # Price validation
         if min_price is not None and min_price <= 0:
-            raise ValidationError(
-                {"min_price_eur": "Minimum price must be greater than zero."}
-            )
+            self.add_error("min_price_cents", "Minimum price must be greater than zero.")
 
-        # 3) buy_now_price needs to be >= min_price
         if buy_now is not None and min_price is not None and buy_now < min_price:
-            raise ValidationError(
-                {"buy_now_price_eur": "Buy Now price cannot be lower than the minimum price."}
+            self.add_error(
+                "buy_now_price_cents",
+                "Buy Now price cannot be lower than the minimum price."
             )
 
         return cleaned_data
+
