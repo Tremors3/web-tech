@@ -1,32 +1,157 @@
-{% extends "base.html" %}
+{% extends 'base/base_column.html' %}
 {% load static %}
 
 {% block navbar %} {% include 'auctions/includes/create_navbar.html' %} {% endblock %}
 
+{% block extra_css %} <link rel="stylesheet" type="text/css" href="{% static 'auctions/css/base.css' %}"> {% endblock %}
+
 {% block title %}Create Auction{% endblock %}
 
-{% block content %}
+{% block main_column %}
 <div class="d-flex flex-column align-items-center gap-4 pt-5">
 
     <!-- FIRST SECTION -->
     <div class="card col-10 col-md-8 col-lg-6 col-xl-5 bg-white rounded shadow gap-4 py-4 px-4">
     
+        <h2 class="text-center">Create a New Auction</h2>
 
-        
-
-        <h2 class="mb-4">Create a New Auction</h2>
-
-        <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+        <form method="post" enctype="multipart/form-data" class="d-flex flex-column gap-4" novalidate>
             {% csrf_token %}
-            {{ form.as_p }}
 
-            <button type="submit" class="btn btn-primary mt-2">
+            <!-- Non Field Errors -->
+            {{ form.non_field_errors }}
+
+            <!-- Auction Fields -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+
+                <h5>Enter Auction Info</h5>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.title.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.title }}
+                        {{ form.title.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.image.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.image }}
+                        {{ form.image.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.description.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.description }}
+                        {{ form.description.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.technical_details.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.technical_details }}
+                        {{ form.technical_details.errors }}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Date Fields -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Enter Dates Info</h5>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.start_date.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.start_date }}
+                        {{ form.start_date.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.end_date.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.end_date }}
+                        {{ form.end_date.errors }}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Price Fields -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+                
+                <h5>Enter Prices Info</h5>
+                
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.min_price_eur.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.min_price_eur }}
+                        {{ form.min_price_eur.errors }}
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.buy_now_price_eur.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.buy_now_price_eur }}
+                        {{ form.buy_now_price_eur.errors }}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Categoru Fields -->
+            <div class="d-flex flex-column border rounded bg-light-subtle gap-3 p-3">
+
+                <h5>Select the Auction Category</h5>
+            
+                <div class="d-flex align-items-center">
+                    <label class="me-3" style="width: 150px;">{{ form.category.label }}</label>
+                    <div class="flex-grow-1">
+                        {{ form.category }}
+                        {{ form.category.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn btn-primary w-100">
                 Create Auction
             </button>
         </form>
-
-
-
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Seleziona i campi dei prezzi tramite id o classe
+    const priceFields = ['id_min_price_eur', 'id_buy_now_price_eur'];
+
+    priceFields.forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        if (input) {
+            input.addEventListener('input', () => {
+                // Rimuove tutti i caratteri non numerici e non il punto decimale
+                input.value = input.value.replace(/[^0-9.]/g, '');
+            });
+
+            // Impedisce l'inserimento di più punti decimali
+            input.addEventListener('blur', () => {
+                const parts = input.value.split('.');
+                if (parts.length > 2) {
+                    input.value = parts[0] + '.' + parts.slice(1).join('');
+                }
+            });
+        }
+    });
+});
+</script>
 {% endblock %}
