@@ -1,3 +1,32 @@
-from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView
 
-# Create your views here.
+from .mixins import SellerRequiredMixin
+from .models import Auction
+from .forms import AuctionForm
+from accounts.models import Seller, Role
+
+
+class AuctionCreateView(SellerRequiredMixin, CreateView):
+    model = Auction
+    form_class = AuctionForm
+    template_name = "auctions/create.html"
+
+    def form_valid(self, form):
+        user = self.request.user
+        
+        # Get the active Seller Role
+        try:
+            seller_role = Role.objects.get(user=user, type="SELLER", state="ACTIVE")
+            seller_obj = Seller.objects.get(role=seller_role)
+        except (Role.DoesNotExist, Seller.DoesNotExist):
+            form.add_error(None, "Impossibile trovare il profilo Seller per questo utente.")
+            return self.form_invalid(form)
+
+        # Link the Auction to the Seller
+        form.instance.seller = seller_obj
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("accounts:profile", kwargs={"pk": self.request.user.pk})

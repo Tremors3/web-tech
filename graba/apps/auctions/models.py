@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
 
+from .scripts.misc import auction_image_upload_to
 
 class Category(models.Model):
     name = models.CharField(primary_key=True, max_length=100)
@@ -31,7 +32,12 @@ class Auction(models.Model):
     ]
 
     title = models.CharField(max_length=100)
-    image_url = models.URLField()
+    image = models.ImageField(
+        upload_to=auction_image_upload_to,
+        default="placeholders/noimage.png",
+        blank=True,
+        null=True
+    )
     description = models.TextField(blank=True, null=True)
     technical_details = models.TextField(blank=True, null=True)
     start_date = models.DateTimeField(default=timezone.now)

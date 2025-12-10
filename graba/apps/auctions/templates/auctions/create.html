@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block navbar %} {% include 'auctions/includes/create_navbar.html' %} {% endblock %}
+
+{% block title %}Create Auction{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center gap-4 pt-5">
+
+    <!-- FIRST SECTION -->
+    <div class="card col-10 col-md-8 col-lg-6 col-xl-5 bg-white rounded shadow gap-4 py-4 px-4">
+    
+
+        
+
+        <h2 class="mb-4">Create a New Auction</h2>
+
+        <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <button type="submit" class="btn btn-primary mt-2">
+                Create Auction
+            </button>
+        </form>
+
+
+
+    </div>
+</div>
+{% endblock %}

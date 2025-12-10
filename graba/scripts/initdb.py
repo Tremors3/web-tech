@@ -105,7 +105,7 @@ class ManageDB():
         
         for j in range(randint(min_, max_)):
             title = choice(self.auction_mocks['title'])
-            image = choice(self.auction_mocks['image_url'])
+            #image = choice(self.auction_mocks['image_url'])
             descr = choice(self.auction_mocks['description'])
             techn = choice(self.auction_mocks['technical_details'])
             
@@ -122,7 +122,7 @@ class ManageDB():
             
             auction = Auction.objects.create(
                 title=title,
-                image_url=image,
+                #image=image,  # Using the placeholder
                 description=descr,
                 technical_details=techn,
                 start_date=start_date,

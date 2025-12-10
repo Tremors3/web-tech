@@ -33,6 +33,9 @@ urlpatterns = [
     
     # Favorites
     path('favorites/', include('favorites.urls', namespace='favorites')),
+    
+    # Auctions
+    path('auctions/', include('auctions.urls', namespace='auctions')),
 ]
 
 

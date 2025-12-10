@@ -11,7 +11,8 @@
         <button class="nav-link btn btn-link" type="submit">Logout</button>
     </form>
     {% if  profile_user == request.user %}
-        <a class="nav-link" href="{% url 'accounts:edit' %}">Edit</a> <!-- TO REMOVE -->
+        <a class="nav-link" href="{% url 'accounts:edit' %}">Edit Profile</a> <!-- TO CREATE AS BUTTON IN TEMPLATE -->
+        <a class="nav-link" href="{% url 'auctions:create' %}">Create an Auction</a> <!-- TO CREATE AS BUTTON IN TEMPLATE -->
     {% endif %}
 {% else %}
     <!-- User is not logged -->
