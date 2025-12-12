@@ -76,8 +76,9 @@ DEFAULT_APPS = [
 ]
 
 EXTERNAL_APPS = [
-    'django_extensions',
+    'daphne',
     'jazzmin',
+    'django_extensions',
 ]
 
 INTERNAL_APPS = [
@@ -124,6 +125,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 
 # ======================================================== #

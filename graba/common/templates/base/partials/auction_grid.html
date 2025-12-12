@@ -19,7 +19,7 @@
 
                         <!-- RESIZED IMAGE -->
                         {% if auction.image.url %}
-                            <a href="{% url 'core:home' %}">  <!-- url 'core:auction_detail' auction.id -->
+                            <a href="{% url 'auctions:auction-detail' auction.id %}">
                                 <img src="{{ auction.image.url }}"
                                     class="card-img-top"
                                     alt="{{ auction.title }}"
@@ -45,7 +45,7 @@
 
                     <!-- CARD BODY -->
                     <div class="card-body">
-                        <a href="{% url 'core:home' %}"
+                        <a href="{% url 'auctions:auction-detail' auction.id %}"
                             class="link-dark no-underline-on-hover">
                             <h5 class="card-title">{{ auction.title|truncatewords:10 }}</h5>
                         </a>

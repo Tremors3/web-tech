@@ -1,0 +1,346 @@
+{% extends 'base/base_column.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block navbar %} {% include 'auctions/includes/create_navbar.html' %} {% endblock %}
+
+{% block extra_css %} <link rel="stylesheet" type="text/css" href="{% static 'auctions/css/base.css' %}"> {% endblock %}
+
+{% block title %}Create Auction{% endblock %}
+
+{% block main_column %}
+<div class="d-flex flex-column align-items-center gap-4 pt-4">
+
+
+
+    <!-- FIRST SECTION -->
+    <div class="card bg-white rounded shadow py-4 px-4 w-100">
+
+        <h2>{{ object.title }}</h2>
+        <hr>
+
+        <div class="d-flex gap-3">
+
+            <!-- IMAGE ON THE LEFT WITH FAVORITE ICON -->
+            {% if object.image.url %}
+                <div class="position-relative flex-shrink-0" style="width: auto; max-width: 300px;">
+                    <a href="{% url 'auctions:auction-detail' object.id %}">
+                        <img src="{{ object.image.url }}"
+                            class="img-fluid rounded h-100"
+                            alt="{{ object.title }}"
+                            style="object-fit:contain; background-color:#f8f9fa; width:100%; height:100%;">
+                    </a>
+
+                    {% if request.user.is_authenticated %}
+                        <div class="favorite-toggle"
+                            data-auction="{{ object.id }}"
+                            style="position:absolute; top:10px; right:10px; cursor:pointer;">
+                            
+                            {% if object.id in user_favorites %}
+                                <i class="bi bi-bookmark-fill text-dark"></i>
+                            {% else %}
+                                <i class="bi bi-bookmark text-dark"></i>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- TEXT ON THE RIGHT -->
+            <div class="d-flex flex-column flex-grow-1 gap-3">
+
+                <!-- DESCRIPTION SECTION -->
+                <div class="p-3 bg-light rounded shadow-sm d-flex flex-column">
+                    <h5 class="mb-2"><i class="bi bi-file-text"></i> Description</h5>
+                    <p class="mb-0">{{ object.description }}</p>
+                </div>
+
+                <!-- TECHNICAL DETAILS SECTION -->
+                <div class="p-3 bg-light rounded shadow-sm d-flex flex-column">
+                    <h5 class="mb-2"><i class="bi bi-gear"></i> Technical Details</h5>
+                    <p class="mb-0">{{ object.technical_details }}</p>
+                </div>
+
+                <!-- OTHER INFO IN TWO COLUMNS -->
+                <div class="d-flex gap-3 align-items-stretch">
+
+                    <!-- LEFT INFO -->
+                    <div class="d-flex flex-column gap-3 flex-grow-1">
+                        <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
+                            <h5 class="mb-2"><i class="bi bi-calendar"></i> Dates</h5>
+                            <p class="mb-0"><strong>Start:</strong> {{ object.start_date|date:"d M Y H:i" }}</p>
+                            <p class="mb-0"><strong>End:</strong> {{ object.end_date|date:"d M Y H:i" }}</p>
+                        </div>
+                        <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
+                            <h5 class="mb-2"><i class="bi bi-clock"></i> Ends in</h5>
+                            <p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT INFO -->
+                    <div class="d-flex flex-column gap-3 flex-grow-1">
+                        <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
+                            <h5 class="mb-2"><i class="bi bi-info-circle"></i> Status</h5>
+                            <p class="mb-0">{{ object.status }}</p>
+                        </div>
+                        <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
+                            <h5 class="mb-2"><i class="bi bi-currency-euro"></i> Pricing</h5>
+                            {% if highest_bid %}
+                                <p id="highest-bid-badge" class="mb-0"><strong>Highest Offer:</strong> €{{ highest_bid|cents_to_price }}</p>
+                            {% else %}
+                                <p class="mb-0"><strong>Minimum Price:</strong> €{{ object.min_price_cents|cents_to_price }}</p>
+                                {% if object.buy_now_price_cents %}
+                                    <p class="mb-0"><strong>Buy Now Price:</strong> €{{ object.buy_now_price_cents|cents_to_price }}</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+
+    <!-- SECOND SECTION -->
+    <div class="card bg-white rounded shadow py-4 px-4 w-100">
+
+        <h4>Seller Info</h4>
+        <hr>
+
+        <div class="d-flex gap-3 align-items-start flex-wrap">
+
+            <!-- LEFT COLUMN -->
+            {% if object.seller.role.user.legal_type == "SHOPKEEPER" %}
+                <div class="d-flex flex-column gap-3 flex-grow-1 min-w-200px">
+                    <div class="d-flex align-items-center">
+                        <strong class="me-3" style="width: 150px;">Business Name:</strong>
+                        <span>{{ object.seller.role.user.shopkeeper.business_name }}</span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <strong class="me-3" style="width: 150px;">Headquarters:</strong>
+                        <span>{{ object.seller.role.user.shopkeeper.headquarters_address }}</span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <strong class="me-3" style="width: 150px;">VAT Number:</strong>
+                        <span>{{ object.seller.role.user.shopkeeper.iva_number }}</span>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- RIGHT COLUMN -->
+            <div class="d-flex flex-column gap-3 flex-grow-1 min-w-200px">
+                <div class="d-flex align-items-center justify-content-between">
+
+                    <div class="d-flex align-items-center">
+                        <strong class="me-3" style="width: 150px;">Username:</strong>
+                        <span>{{ object.seller.role.user.username }}</span>
+                    </div>
+
+                    <!-- LINK PROFILO -->
+                    <a href="{% url 'accounts:profile' object.seller.role.user.id %}" 
+                    class="d-flex align-items-center text-primary text-decoration-none">
+                        <i class="bi bi-person-circle me-1"></i> View Profile
+                    </a>
+                </div>
+
+                {% if object.seller.role.user.legal_type == "PRIVATE" and profile_user.first_name or profile_user.last_name %}
+                    <div class="d-flex align-items-center">
+                        <strong class="me-3" style="width: 150px;">Full Name:</strong>
+                        <span>{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Collection Address:</strong>
+                    <span>{{ object.seller.collection_address }}</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!-- THIRD SECTION -->
+    <div class="card bg-white rounded shadow py-4 px-4 w-100 position-relative">
+
+        {% if is_buyer and object.status == "OPEN" %}
+            <h4 class="mb-3">Place a Bid</h4>
+
+            <form method="POST" id="bid-form" class="d-flex align-items-center flex-wrap gap-2">
+                {% csrf_token %}
+                
+                <!-- Input amount con icona € -->
+                <div class="input-group" style="max-width: 200px;">
+                    <span class="input-group-text">€</span>
+                    <input type="number" class="form-control" name="amount" step="0.01" min="0.01" placeholder="Your bid" required>
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary px-4">Bid</button>
+            </form>
+            <hr>
+        {% endif %}
+
+        <!-- HIGHEST BID BADGE -->
+        {% if highest_bid %}
+            <div class="position-absolute top-0 end-0 m-3">
+                <span id="highest-bid-badge" class="badge bg-primary p-2 shadow">
+                    Highest: €{{ highest_bid|cents_to_price }}
+                </span>
+            </div>
+        {% else %}
+            <div class="position-absolute top-0 end-0 m-3">
+                <span id="highest-bid-badge" class="badge bg-primary p-2 shadow">
+                    Highest: €0.00
+                </span>
+            </div>
+        {% endif %}
+
+        <!-- BIDS LIST -->
+        <div style="max-height: 250px; overflow-y:auto;">
+            <ul id="bid-list" class="list-group list-group-flush">
+                {% for b in bids %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ b.buyer.role.user.username }}</strong>
+                            <small class="text-muted ms-2">{{ b.offer_time|date:"H:i d M Y" }}</small>
+                        </div>
+                        <span>€{{ b.amount_cents|cents_to_price }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ============================================================
+       SEND BID FORM WITH AJAX (NO PAGE RELOAD)
+    ============================================================ */
+
+    const bidForm = document.getElementById('bid-form');
+    const bidInput = bidForm.querySelector('input[name="amount"]');
+    const csrfToken = bidForm.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    bidForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const response = await fetch("{% url 'auctions:auction-bid' object.id %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Accept": "application/json",
+            },
+            body: new URLSearchParams({
+                amount: bidInput.value
+            })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.error || "Error placing bid");
+            return;
+        }
+
+        // Reset input
+        bidInput.value = "";
+        // The actual update of the list happens via WebSocket
+    });
+
+
+
+    /* ============================================================
+       DOM ELEMENTS
+    ============================================================ */
+
+    const bidList = document.getElementById('bid-list');
+    const highestBidBadge = document.getElementById('highest-bid-badge');
+
+
+
+    /* ============================================================
+       ADD NEW BID TO DOM + UPDATE HIGHEST BID
+    ============================================================ */
+
+    function addNewBid(bid) {
+
+        const li = document.createElement('li');
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+        li.innerHTML = `
+            <div>
+                <strong>${bid.username}</strong>
+                <small class="text-muted ms-2">${formatDate(bid.offer_time)}</small>
+            </div>
+            <span>€${bid.amount_display}</span>
+        `;
+
+        // Insert at the top
+        bidList.prepend(li);
+
+        // Update highest bid badge
+        const currentHighest = parseFloat(
+            highestBidBadge.textContent.replace("Highest: €", "")
+        );
+        const newAmount = parseFloat(bid.amount_display);
+
+        if (newAmount > currentHighest) {
+            highestBidBadge.textContent = `Highest: €${bid.amount_display}`;
+        }
+    }
+
+
+
+    /* ============================================================
+       OFFER_TIME → PRETTY FORMATTER
+    ============================================================ */
+
+    function formatDate(dt) {
+        const date = new Date(dt);
+        return date.toLocaleString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        });
+    }
+
+
+
+    /* ============================================================
+       WEBSOCKET CONNECTION
+    ============================================================ */
+
+    const auctionId = "{{ auction_id }}";
+    const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
+    const ws = new WebSocket(
+        wsProtocol + window.location.host + "/ws/auction/" + auctionId + "/"
+    );
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "new_bid" && data.bid) {
+            addNewBid(data.bid);
+        }
+    };
+
+});
+</script>
+{% endblock %}

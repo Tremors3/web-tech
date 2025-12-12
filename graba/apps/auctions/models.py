@@ -61,6 +61,9 @@ class Auction(models.Model):
             highest=models.Max('amount_cents')
         )['highest']
     
+    def is_bn_enabled(self) -> bool:
+        return (self.buy_now_price_cents is not None)
+    
     @property
     def ftime_left(self):
         current_date = timezone.now()
@@ -117,7 +120,7 @@ class Offer(models.Model):
         verbose_name = "Offer"
         verbose_name_plural = "Offers"
         db_table_comment = "An offer"
-        ordering = ["-offer_time", "type"]
+        ordering = ["type", "-amount_cents", "-offer_time"]
 
 
 class WinnerOffer(models.Model):

@@ -5,3 +5,15 @@ textarea {
   resize: none;
   margin-left: 28px;
 }
+
+
+#bid-list li:hover {
+    background-color: #f8f9fa;
+}
+#bid-list::-webkit-scrollbar {
+    width: 6px;
+}
+#bid-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
