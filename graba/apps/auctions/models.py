@@ -26,7 +26,7 @@ class Category(models.Model):
 class Auction(models.Model):
     STATUS_CHOICES = [
         ('OPEN', 'Open'),
-        ('PENDING', 'Pending'),
+        #('PENDING', 'Pending'),
         ('CLOSED', 'Closed'),
         ('CANCELLED', 'Cancelled'),
     ]
@@ -50,7 +50,7 @@ class Auction(models.Model):
     category = models.ForeignKey('auctions.Category', null=True, on_delete=models.SET_NULL)
 
     @property
-    def has_offers(self, type_:str='BID') -> int:
+    def has_offers(self, type_:str='BID') -> bool:
         return Offer.objects.filter(auction=self, type=type_).exists()
 
     def get_offers_number(self, type_:str='BID') -> int:
@@ -65,24 +65,41 @@ class Auction(models.Model):
         return (self.buy_now_price_cents is not None)
     
     @property
-    def ftime_left(self):
-        current_date = timezone.now()
+    def ftime_tag(self) -> str:
+        now = timezone.now()
+        return "Ended" if now > self.end_date else "Starts in" if now < self.start_date else "Finishes in"
 
-        if (current_date > self.end_date):
-            return 'Ended'
+    @property
+    def ftime_left(self) -> str | None:
+        now = timezone.now()
 
-        diff = self.end_date - current_date
-        remaining_seconds = diff.seconds
+        # If the auction is ended
+        if now > self.end_date:
+            return None
 
-        days = diff.days
-        hours, remaining_seconds = divmod(remaining_seconds, 3600)
-        minutes, seconds = divmod(remaining_seconds, 60)
+        # Reference timestamp: start or end
+        end = self.start_date if now < self.start_date else self.end_date
 
-        if days: return f'{days}d {hours}h'
-        if hours: return f'{hours}h {minutes}m'
-        if minutes: return f'{minutes}m {seconds}s'
-        return f'{seconds}s'
-    
+        # Difference in seconds
+        total_seconds = int((end - now).total_seconds())
+
+        days, remainder = divmod(total_seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        parts = []
+        if days > 0:
+            parts.append(f"{days}d")
+        if hours > 0:
+            parts.append(f"{hours}h")
+        if minutes > 0:
+            parts.append(f"{minutes}m")
+        if not parts:
+            parts.append(f"{seconds}s")
+
+        # Show at most two units
+        return " ".join(parts[:2])
+
     def __str__(self):
         return self.title
 
@@ -96,7 +113,7 @@ class Auction(models.Model):
 class Offer(models.Model):
     TYPE_CHOICES = [
         ('BID', 'Bid'),
-        ('PROPOSE', 'Propose'),
+        #('PROPOSE', 'Propose'),
         ('BUY_NOW', 'Buy Now'),
     ]
 
@@ -113,6 +130,10 @@ class Offer(models.Model):
     auction = models.ForeignKey(Auction, on_delete=models.CASCADE)
     buyer = models.ForeignKey('accounts.Buyer', on_delete=models.CASCADE)
 
+    @property
+    def is_buy_now(self):
+        return self.offer_type == Offer.Type.BUY_NOW
+
     def __str__(self):
         return f"{self.type} - {self.amount}"
 
@@ -124,7 +145,9 @@ class Offer(models.Model):
 
 
 class WinnerOffer(models.Model):
-    auction = models.OneToOneField('auctions.Auction', on_delete=models.CASCADE, primary_key=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    auction = models.OneToOneField('auctions.Auction', on_delete=models.CASCADE, primary_key=True, related_name='winner_offer')
     offer = models.OneToOneField('auctions.Offer', on_delete=models.CASCADE, unique=True)
 
     def __str__(self):

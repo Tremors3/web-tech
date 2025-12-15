@@ -72,7 +72,7 @@
                             <p class="mb-0"><strong>End:</strong> {{ object.end_date|date:"d M Y H:i" }}</p>
                         </div>
                         <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
-                            <h5 class="mb-2"><i class="bi bi-clock"></i> Ends in</h5>
+                            <h5 class="mb-2"><i class="bi bi-clock"></i> {{ auction.ftime_tag }}</h5>
                             <p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>
                         </div>
                     </div>
@@ -165,60 +165,170 @@
 
 
 
-    <!-- THIRD SECTION -->
-    <div class="card bg-white rounded shadow py-4 px-4 w-100 position-relative">
+    <!-- THIRD SECTION: Winner -->
+    {% if object.status == "CLOSED" and winner_offer %}
+    <div class="card bg-white rounded shadow py-4 px-4 w-100">
 
-        {% if is_buyer and object.status == "OPEN" %}
-            <h4 class="mb-3">Place a Bid</h4>
+        <h4>Auction Winner</h4>
+        <hr>
 
-            <form method="POST" id="bid-form" class="d-flex align-items-center flex-wrap gap-2">
-                {% csrf_token %}
-                
-                <!-- Input amount con icona € -->
-                <div class="input-group" style="max-width: 200px;">
-                    <span class="input-group-text">€</span>
-                    <input type="number" class="form-control" name="amount" step="0.01" min="0.01" placeholder="Your bid" required>
+        <div class="d-flex gap-3 align-items-start flex-wrap">
+
+            <!-- LEFT COLUMN: Winning Offer -->
+            <div class="d-flex flex-column gap-3 flex-grow-1 min-w-200px">
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Type:</strong>
+                    {% if winner_offer.offer.type == "BID" %}
+                        Highest Bid
+                    {% else %}
+                        Buy Now
+                    {% endif %}
                 </div>
 
-                <!-- Submit button -->
-                <button type="submit" class="btn btn-primary px-4">Bid</button>
-            </form>
-            <hr>
-        {% endif %}
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Amount:</strong>
+                    €{{ winner_offer.offer.amount_cents|cents_to_price }}
+                </div>
 
-        <!-- HIGHEST BID BADGE -->
-        {% if highest_bid %}
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Date:</strong>
+                    {{ winner_offer.offer.offer_time|date:"d M Y H:i" }}
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Winner Information -->
+            <div class="d-flex flex-column gap-3 flex-grow-1 min-w-200px">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <strong class="me-3" style="width: 150px;">Username:</strong>
+                        {{ winner_offer.offer.buyer.role.user.username }}
+                    </div>
+                    <a href="{% url 'accounts:profile' winner_offer.offer.buyer.role.user.id %}" 
+                    class="d-flex align-items-center text-primary text-decoration-none">
+                        <i class="bi bi-person-circle me-1"></i> Visit Profile
+                    </a>
+                </div>
+
+                {% if winner_offer.created_at %}
+                <div class="d-flex align-items-center">
+                    <strong class="me-3" style="width: 150px;">Finalized at:</strong>
+                    {{ winner_offer.created_at|date:"d M Y H:i" }}
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+    {% endif %}
+
+
+
+    <!-- FOURTH SECTION -->
+    {% if object.status == "OPEN" %}
+    <div class="card bg-white rounded shadow py-4 px-4 w-100 position-relative">
+
+        <h4>Bids and Buy Section</h4>
+        <hr>
+    
+        <div class="d-flex flex-column gap-3">
+
+            <!-- NO BIDS TEXT -->
+            <p id="no-bids-found-text" class="mb-0 d-none">No bids found.</p>
+            
+            <!-- HIGHEST BID BADGE -->
             <div class="position-absolute top-0 end-0 m-3">
-                <span id="highest-bid-badge" class="badge bg-primary p-2 shadow">
-                    Highest: €{{ highest_bid|cents_to_price }}
+                <span id="highest-bid-live-badge"
+                    data-amount="0"
+                    class="badge bg-primary bg-gradient p-2 px-3 shadow-sm d-none">
+                    <i class="bi bi-trophy me-1"></i>
+                    Highest: €{{ highest_bid|default:0|cents_to_price }}
                 </span>
             </div>
-        {% else %}
-            <div class="position-absolute top-0 end-0 m-3">
-                <span id="highest-bid-badge" class="badge bg-primary p-2 shadow">
-                    Highest: €0.00
-                </span>
-            </div>
-        {% endif %}
 
-        <!-- BIDS LIST -->
-        <div style="max-height: 250px; overflow-y:auto;">
-            <ul id="bid-list" class="list-group list-group-flush">
-                {% for b in bids %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{ b.buyer.role.user.username }}</strong>
-                            <small class="text-muted ms-2">{{ b.offer_time|date:"H:i d M Y" }}</small>
-                        </div>
-                        <span>€{{ b.amount_cents|cents_to_price }}</span>
-                    </li>
-                {% endfor %}
-            </ul>
+            <!-- BIDS LIST -->
+            <div id="bid_list_section" class="p-3 bg-light rounded shadow-sm d-none">
+                <h5 class="mb-3">
+                    <i class="bi bi-list-ul me-1"></i> Latest Bids
+                </h5>
+
+                <div style="max-height: 250px; overflow-y:auto;">
+                    <ul id="bid-list" class="list-group list-group-flush">
+                        {% for b in bids %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ b.buyer.role.user.username }}</strong>
+                                    <small class="text-muted ms-2">
+                                        {{ b.offer_time|date:"H:i d M Y" }}
+                                    </small>
+                                </div>
+                                <span class="fw-semibold">
+                                    €{{ b.amount_cents|cents_to_price }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PLACE BID FORM -->
+            {% if is_buyer and object.status == "OPEN" %}
+            <div class="p-3 bg-light rounded shadow-sm">
+                <h5 class="mb-3">
+                    <i class="bi bi-tag-fill me-1"></i> Place a Bid
+                </h5>
+
+                <form method="POST" id="bid-form" class="d-flex align-items-center gap-3 flex-wrap">
+                    {% csrf_token %}
+
+                    <div class="input-group" style="max-width: 220px;">
+                        <span class="input-group-text">€</span>
+                        <input type="number"
+                            class="form-control"
+                            name="amount"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="Your bid"
+                            required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-arrow-up-circle me-1"></i> Bid
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- BUY NOW FORM -->
+            {% if is_bn_enabled and is_buyer and object.status == "OPEN" %}
+            <div id="buy_now_section" class="p-3 bg-light rounded shadow-sm d-none">
+                <h5 class="mb-3">
+                    <i class="bi bi-bag-fill me-1"></i> Buy Now
+                </h5>
+                
+                <form method="POST" id="buy-now-form" class="d-flex align-items-center gap-3">
+                    {% csrf_token %}
+
+                    <p class="mb-0">
+                        <strong>Price:</strong>
+                        €{{ object.buy_now_price_cents|cents_to_price }}
+                    </p>
+
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-lightning-fill me-1"></i> Buy
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- AUCTION ERROR LIST -->
+            <div id="auction_error_list" class="alert alert-danger list-icon list-icon-error d-none">
+                <ul class="errorlist" id="id_title_error"></ul>
+            </div>
+
         </div>
 
     </div>
-
-
+    {% endif %}
 
 </div>
 {% endblock %}
@@ -227,40 +337,106 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+    /* Helpers */
+    function show(el) {
+        el?.classList.remove("d-none");
+    }
+
+    function hide(el) {
+        el?.classList.add("d-none");
+    }
+
     /* ============================================================
        SEND BID FORM WITH AJAX (NO PAGE RELOAD)
     ============================================================ */
+    
+    const aucAlert = document.getElementById('auction_error_list');
+    const titleErr = document.getElementById('id_title_error');
 
     const bidForm = document.getElementById('bid-form');
-    const bidInput = bidForm.querySelector('input[name="amount"]');
-    const csrfToken = bidForm.querySelector('[name=csrfmiddlewaretoken]').value;
+    if (bidForm) {
+        const bidInput = bidForm.querySelector('input[name="amount"]');
+        const csrfToken = bidForm.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    bidForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
+        bidForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-        const response = await fetch("{% url 'auctions:auction-bid' object.id %}", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken,
-                "Accept": "application/json",
-            },
-            body: new URLSearchParams({
-                amount: bidInput.value
-            })
+            const response = await fetch("{% url 'auctions:auction-bid' object.id %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Accept": "application/json",
+                },
+                body: new URLSearchParams({
+                    amount: bidInput.value
+                })
+            });
+
+            const data = await response.json();
+
+            // Always clear old error messages
+            titleErr.innerHTML = "";
+
+            if (!data.success) {
+                // Display error msg
+                show(aucAlert);
+                
+                const li = document.createElement("li");
+                li.textContent = data.error || "Unknown error occurred.";
+                titleErr.appendChild(li);
+
+                return;
+            }
+
+            // Hide error Msgs and reset the input
+            hide(aucAlert);
+            bidInput.value = "";
+
+            // The actual update of the list happens via WebSocket
         });
+    }
 
-        const data = await response.json();
 
-        if (!data.success) {
-            alert(data.error || "Error placing bid");
-            return;
-        }
 
-        // Reset input
-        bidInput.value = "";
-        // The actual update of the list happens via WebSocket
-    });
+    /* ============================================================
+       SEND BUY-NOW FORM WITH AJAX (NO PAGE RELOAD)
+    ============================================================ */
+    
+    const buyNowForm = document.getElementById("buy-now-form");
 
+    if (buyNowForm) {
+        const csrfToken_bn = buyNowForm.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        buyNowForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const response = await fetch(
+                "{% url 'auctions:auction-buy-now' object.id %}",
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken_bn,
+                        "Accept": "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            titleErr.innerHTML = "";
+
+            if (!data.success) {
+                show(aucAlert);
+                const li = document.createElement("li");
+                li.textContent = data.error || "Buy Now failed.";
+                titleErr.appendChild(li);
+                return;
+            }
+
+            // Reload page on Success
+            window.location.reload();
+        });
+    }
 
 
     /* ============================================================
@@ -268,7 +444,33 @@ document.addEventListener('DOMContentLoaded', () => {
     ============================================================ */
 
     const bidList = document.getElementById('bid-list');
-    const highestBidBadge = document.getElementById('highest-bid-badge');
+    const highestBidBadge = document.getElementById('highest-bid-live-badge');
+
+
+
+    /* ============================================================
+       UPDATE LIST VISIBILITY
+    ============================================================ */
+
+    const bidListSection = document.getElementById('bid_list_section');
+    const buyNowSection = document.getElementById('buy_now_section');
+    const noBidsFoundTxt = document.getElementById('no-bids-found-text');
+
+    function updateBidListVisibility() {
+        if (bidList.children.length === 0) {
+            hide(bidListSection);
+            hide(highestBidBadge);
+            show(noBidsFoundTxt);
+            show(buyNowSection);
+        } else {
+            show(bidListSection);
+            show(highestBidBadge);
+            hide(noBidsFoundTxt);
+            hide(buyNowSection);
+        }
+    }
+
+    updateBidListVisibility();
 
 
 
@@ -284,23 +486,32 @@ document.addEventListener('DOMContentLoaded', () => {
         li.innerHTML = `
             <div>
                 <strong>${bid.username}</strong>
-                <small class="text-muted ms-2">${formatDate(bid.offer_time)}</small>
+                <small class="text-muted ms-2">
+                    ${formatDate(bid.offer_time)}
+                </small>
             </div>
-            <span>€${bid.amount_display}</span>
+            <span class="fw-semibold">
+                €${bid.amount_display}
+            </span>
         `;
 
         // Insert at the top
         bidList.prepend(li);
 
         // Update highest bid badge
-        const currentHighest = parseFloat(
-            highestBidBadge.textContent.replace("Highest: €", "")
-        );
+        const currentHighest = parseFloat(highestBidBadge.dataset.amount);
         const newAmount = parseFloat(bid.amount_display);
 
         if (newAmount > currentHighest) {
-            highestBidBadge.textContent = `Highest: €${bid.amount_display}`;
+            highestBidBadge.dataset.amount = newAmount;
+            highestBidBadge.innerHTML = `
+                <i class="bi bi-trophy me-1"></i>
+                Highest: €${bid.amount_display}
+            `;
         }
+
+        // Shows the section if necessary
+        updateBidListVisibility();
     }
 
 
@@ -338,6 +549,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.type === "new_bid" && data.bid) {
             addNewBid(data.bid);
+        }
+
+        if (data.type === "buy_now") {
+            alert(`Auction bought by ${data.buy_now.username} for €${data.buy_now.amount_display}`);
+            window.location.reload();
         }
     };
 

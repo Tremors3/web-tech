@@ -15,12 +15,26 @@ class AuctionConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
+    # NEW BID
+
     async def new_bid(self, event):
         await self.send(text_data=json.dumps({
             "type": "new_bid",
             "bid": {
                 "username": event["username"],
                 "amount_cents": event["amount_cents"],
+                "amount_display": event["amount_display"],
+                "offer_time": event["offer_time"],
+            }
+        }))
+    
+    # BUY NOW
+    
+    async def buy_now(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "buy_now",
+            "buy_now": {
+                "username": event["username"],
                 "amount_display": event["amount_display"],
                 "offer_time": event["offer_time"],
             }
