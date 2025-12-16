@@ -261,6 +261,9 @@ class AuctionBuyNowView(View):
         # Close auction
         auction.status = "CLOSED"
         auction.save(update_fields=["status"])
+        
+        # Remove scheduled close_auction_task if exists
+        PeriodicTask.objects.filter(name=f"close_auction_{auction.pk}").delete()
 
         # Notify WebSocket
         payload = {
@@ -275,6 +278,7 @@ class AuctionBuyNowView(View):
             f"auction_{auction.pk}", payload
         )
 
+        # JSON response
         return JsonResponse({
             "success": True,
             "message": "Auction successfully bought.",
