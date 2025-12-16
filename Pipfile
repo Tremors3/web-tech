@@ -8,6 +8,13 @@ django = "*"
 django-environ = "*"
 django-jazzmin = "*"
 django-extensions = "*"
+django-channels = "*"
+celery = "*"
+redis = "*"
+django-celery-beat = "*"
+channels = "*"
+daphne = "*"
+pillow = "*"
 
 [dev-packages]
 
