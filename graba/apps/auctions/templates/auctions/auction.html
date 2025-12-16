@@ -73,7 +73,9 @@
                         </div>
                         <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
                             <h5 class="mb-2"><i class="bi bi-clock"></i> {{ auction.ftime_tag }}</h5>
-                            {% if object.ftime_left %}<p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>{% endif %}
+                            {% if object.ftime_left %}
+                                <p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -223,7 +225,7 @@
 
 
 
-    <!-- FOURTH SECTION -->
+    <!-- FOURTH SECTION: Bid and BuyNow Section -->
     {% if object.status == "OPEN" %}
     <div class="card bg-white rounded shadow py-4 px-4 w-100 position-relative">
 
@@ -271,7 +273,7 @@
             </div>
 
             <!-- PLACE BID FORM -->
-            {% if is_buyer and object.status == "OPEN" %}
+            {% if is_buyer %}
             <div class="p-3 bg-light rounded shadow-sm">
                 <h5 class="mb-3">
                     <i class="bi bi-tag-fill me-1"></i> Place a Bid
@@ -299,7 +301,7 @@
             {% endif %}
 
             <!-- BUY NOW FORM -->
-            {% if is_bn_enabled and is_buyer and object.status == "OPEN" %}
+            {% if is_bn_enabled and is_buyer %}
             <div id="buy_now_section" class="p-3 bg-light rounded shadow-sm d-none">
                 <h5 class="mb-3">
                     <i class="bi bi-bag-fill me-1"></i> Buy Now
@@ -347,14 +349,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ============================================================
+       SAVE AUCTION STATUS
+    ============================================================ */
+
+    const auctionStatus = "{{ object.status }}";
+
+    /* ============================================================
        SEND BID FORM WITH AJAX (NO PAGE RELOAD)
     ============================================================ */
     
     const aucAlert = document.getElementById('auction_error_list');
     const titleErr = document.getElementById('id_title_error');
-
     const bidForm = document.getElementById('bid-form');
-    if (bidForm) {
+    
+    if (auctionStatus == "OPEN" && bidForm) {
         const bidInput = bidForm.querySelector('input[name="amount"]');
         const csrfToken = bidForm.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -404,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const buyNowForm = document.getElementById("buy-now-form");
 
-    if (buyNowForm) {
+    if (auctionStatus == "OPEN" && buyNowForm) {
         const csrfToken_bn = buyNowForm.querySelector('[name=csrfmiddlewaretoken]').value;
         
         buyNowForm.addEventListener("submit", async (e) => {
@@ -457,16 +465,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const noBidsFoundTxt = document.getElementById('no-bids-found-text');
 
     function updateBidListVisibility() {
-        if (bidList.children.length === 0) {
-            hide(bidListSection);
-            hide(highestBidBadge);
-            show(noBidsFoundTxt);
-            show(buyNowSection);
-        } else {
-            show(bidListSection);
-            show(highestBidBadge);
-            hide(noBidsFoundTxt);
-            hide(buyNowSection);
+        if (auctionStatus == "OPEN") {
+            if (bidList.children.length === 0) {
+                hide(bidListSection);
+                hide(highestBidBadge);
+                show(noBidsFoundTxt);
+                show(buyNowSection);
+            } else {
+                show(bidListSection);
+                show(highestBidBadge);
+                hide(noBidsFoundTxt);
+                hide(buyNowSection);
+            }
         }
     }
 
@@ -547,8 +557,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ws.onmessage = function(event) {
         const data = JSON.parse(event.data);
 
-        if (data.type === "new_bid" && data.bid) {
-            addNewBid(data.bid);
+        if (data.type === "new_bid" && data.new_bid) {
+            addNewBid(data.new_bid);
         }
 
         if (data.type === "buy_now") {
@@ -559,24 +569,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.type === "auction_status_update") {
             const status = data.status;
             
-            // Aggiorna il testo dello stato nell'interfaccia
-            const statusElements = document.querySelectorAll('.card h5 + p.mb-0'); // puoi adattare il selettore al tuo template
-            statusElements.forEach(el => {
-                if (el.previousElementSibling && el.previousElementSibling.textContent.includes('Status')) {
-                    el.textContent = status;
-                }
-            });
+            console.log("UPDATE ARRIVED!")
 
-            // Se l'asta è chiusa, ricarica la pagina per mostrare il vincitore
-            if (status === "CLOSED") {
-                window.location.reload();
-            }
-
-            // Se l'asta è appena aperta, puoi eventualmente mostrare la sezione di bidding
             if (status === "OPEN") {
-                show(bidListSection);
-                show(buyNowSection);
+                // Se l'asta è appena aperta
+                alert(`Auction has been opened`);
             }
+
+            if (status === "CLOSED") {
+                // Se l'asta è chiusa
+                alert(`Auction has finished`);
+            }
+            
+            window.location.reload();
         }
     };
 

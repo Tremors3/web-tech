@@ -25,8 +25,8 @@ class Category(models.Model):
 
 class Auction(models.Model):
     STATUS_CHOICES = [
+        ('SCHEDULED', 'Scheduled'),
         ('OPEN', 'Open'),
-        #('PENDING', 'Pending'),
         ('CLOSED', 'Closed'),
         ('CANCELLED', 'Cancelled'),
     ]
@@ -44,7 +44,7 @@ class Auction(models.Model):
     end_date = models.DateTimeField()
     min_price_cents = models.IntegerField()
     buy_now_price_cents = models.IntegerField(blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='OPEN')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
     
     seller = models.ForeignKey('accounts.Seller', on_delete=models.CASCADE)
     category = models.ForeignKey('auctions.Category', null=True, on_delete=models.SET_NULL)
@@ -66,24 +66,40 @@ class Auction(models.Model):
     def is_bn_enabled(self) -> bool:
         return (self.buy_now_price_cents is not None)
     
+    # === Date Tags ===
+    
     @property
     def ftime_tag(self) -> str:
-        now = timezone.now()
-        return "Ended" if now > self.end_date else "Starts in" if now < self.start_date else "Finishes in"
+        tags = {
+            'SCHEDULED': 'Starts in',
+            'OPEN': 'Ends in',
+            'CLOSED': 'Ended',
+            'CANCELLED': 'Cancelled',
+        }
+        return tags.get(self.status, 'Unknown')
 
     @property
     def ftime_left(self) -> str | None:
         now = timezone.now()
 
-        # If the auction is ended
-        if now > self.end_date:
+        status_tags = {
+            'SCHEDULED': self.start_date,
+            'OPEN': self.end_date,
+        }
+        
+        # If the auction is scheduled or open
+        if self.status not in status_tags:
             return None
 
         # Reference timestamp: start or end
-        end = self.start_date if now < self.start_date else self.end_date
+        end = status_tags.get(self.status, self.end_date)
 
         # Difference in seconds
         total_seconds = int((end - now).total_seconds())
+        
+        # No negative times allowed
+        if total_seconds < 0:
+            return None
 
         days, remainder = divmod(total_seconds, 86400)
         hours, remainder = divmod(remainder, 3600)
@@ -102,7 +118,18 @@ class Auction(models.Model):
         # Show at most two units
         return " ".join(parts[:2])
 
-    # === CELERY TASK ===
+    # === CELERY TASKS ===
+
+    def open(self):
+        """
+        Auction opening procedure. Called by Celery scheduled task.
+        """
+        if self.status != "SCHEDULED":
+            return
+        
+        # Open auction
+        self.status = "OPEN"
+        self.save(update_fields=["status"])
 
     def close(self):
         """

@@ -120,6 +120,8 @@ class ManageDB():
             category_name = choice(self.category_mocks[ choice(list(self.category_mocks.keys())) ])
             category = Category.objects.get(name=category_name)
             
+            status = 'OPEN'  # SCHEDULED, OPEN, CLOSED, CANCELLED
+            
             auction = Auction.objects.create(
                 title=title,
                 #image=image,  # Using the placeholder
@@ -128,6 +130,7 @@ class ManageDB():
                 start_date=start_date,
                 end_date=end_date,
                 min_price_cents=min_price_cents,
+                status=status,
                 
                 seller=seller,
                 category=category

@@ -94,13 +94,7 @@
                                 </span>
                                 
                                 <span class="badge text-dark border bg-light shadow-sm align-self-stretch px-3 py-2">
-                                    {% if auction.status == 'OPEN' %}
-                                        {{ auction.ftime_tag }} {% if auction.ftime_left %}{{ auction.ftime_left }}{% endif %}
-                                    {% elif auction.status == 'CLOSED' %}
-                                        Closed
-                                    {% elif auction.status == 'CANCELLED' %}
-                                        Cancelled
-                                    {% endif %}
+                                    {{ auction.ftime_tag }} {% if auction.ftime_left %}{{ auction.ftime_left }}{% endif %}
                                 </span>
                                 
                                 <!--<a href="{% url 'core:home' %}"

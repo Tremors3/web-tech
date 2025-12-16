@@ -18,7 +18,7 @@ class AuctionConsumer(AsyncWebsocketConsumer):
     async def new_bid(self, event):
         await self.send(text_data=json.dumps({
             "type": "new_bid",
-            "bid": {
+            "new_bid": {
                 "username": event["username"],
                 "amount_cents": event["amount_cents"],
                 "amount_display": event["amount_display"],
@@ -39,9 +39,6 @@ class AuctionConsumer(AsyncWebsocketConsumer):
 
     # AUCTION STATUS UPDATE
     async def auction_status_update(self, event):
-        """
-        Handles auction status changes (OPEN or CLOSED) broadcasted via Celery tasks.
-        """
         await self.send(text_data=json.dumps({
             "type": "auction_status_update",
             "auction_id": event["auction_id"],

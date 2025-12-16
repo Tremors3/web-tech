@@ -34,11 +34,10 @@ def open_auction_task(self, auction_id: int):
     except Auction.DoesNotExist:
         return
 
-    if auction.status != "OPEN":
+    if auction.status != "SCHEDULED":
         return
     
-    auction.status = "OPEN"
-    auction.save(update_fields=["status"])
+    auction.open()
 
     # Notify WebSocket
     broadcast_auction_status(auction)

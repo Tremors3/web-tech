@@ -40,13 +40,16 @@ class AuctionCreateView(SellerRequiredMixin, CreateView):
             form.add_error(None, "Cannot find the Seller profile for this user.")
             return self.form_invalid(form)
 
+        now = timezone.now()
+
+        # Set the correct state
+        auction.state = 'SCHEDULED' if now < auction.start_date else 'OPEN'
+
         # Link the Auction to the Seller
         auction.seller = seller_obj
         auction.save()
 
 
-        now = timezone.now()
-        
         # === SCHEDULING AUCTION OPEN TASK | CELERY ===
         if now < auction.start_date:
             clocked, _ = ClockedSchedule.objects.get_or_create(
@@ -187,7 +190,7 @@ class AuctionBidView(View):
             amount_cents=amount_cents
         )
 
-        # Broadcast to WS
+        # Notify WebSocket
         payload = {
             "type": "new_bid",
             "username": offer.buyer.role.user.username,
@@ -259,7 +262,7 @@ class AuctionBuyNowView(View):
         auction.status = "CLOSED"
         auction.save(update_fields=["status"])
 
-        # Broadcast via WS
+        # Notify WebSocket
         payload = {
             "type": "buy_now",
             "username": offer.buyer.role.user.username,

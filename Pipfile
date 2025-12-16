@@ -15,6 +15,7 @@ django-celery-beat = "*"
 channels = "*"
 daphne = "*"
 pillow = "*"
+channels-redis = "*"
 
 [dev-packages]
 
