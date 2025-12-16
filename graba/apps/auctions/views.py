@@ -42,21 +42,39 @@ class AuctionCreateView(SellerRequiredMixin, CreateView):
 
         # Link the Auction to the Seller
         auction.seller = seller_obj
-
         auction.save()
 
-        # AUCTION CLOSURE SCHEDULING
-        clocked, _ = ClockedSchedule.objects.get_or_create(
-            clocked_time=auction.end_date
-        )
 
-        PeriodicTask.objects.create(
-            clocked=clocked,
-            one_off=True,
-            name=f"close_auction_{auction.pk}",
-            task="auctions.tasks.close_auction_task",
-            args=json.dumps([auction.pk]),
-        )
+        now = timezone.now()
+        
+        # === SCHEDULING AUCTION OPEN TASK | CELERY ===
+        if now < auction.start_date:
+            clocked, _ = ClockedSchedule.objects.get_or_create(
+                clocked_time=auction.start_date
+            )
+
+            PeriodicTask.objects.create(
+                clocked=clocked,
+                one_off=True,
+                name=f"open_auction_{auction.pk}",
+                task="auctions.tasks.open_auction_task",
+                args=json.dumps([auction.pk]),
+            )
+        
+        # === SCHEDULING AUCTION CLOSE TASK | CELERY ===
+        if now < auction.end_date:
+            clocked, _ = ClockedSchedule.objects.get_or_create(
+                clocked_time=auction.end_date
+            )
+
+            PeriodicTask.objects.create(
+                clocked=clocked,
+                one_off=True,
+                name=f"close_auction_{auction.pk}",
+                task="auctions.tasks.close_auction_task",
+                args=json.dumps([auction.pk]),
+            )
+        
 
         return super().form_valid(form)
 
@@ -90,7 +108,7 @@ class AuctionDetailView(DetailView):
         # Other context variables
         
         # Add the winner offer if exists
-        context["winner_offer"] = auction.winner_offer if auction.status == "CLOSED" else None
+        context["winner_offer"] = getattr(auction, 'winner_offer', None) if auction.status == "CLOSED" else None
         
         # Copy GET and remove 'page'
         params = self.request.GET.copy()

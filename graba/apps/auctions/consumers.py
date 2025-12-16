@@ -1,7 +1,6 @@
-# auctions/consumers.py
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-
 
 class AuctionConsumer(AsyncWebsocketConsumer):
 
@@ -16,7 +15,6 @@ class AuctionConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     # NEW BID
-
     async def new_bid(self, event):
         await self.send(text_data=json.dumps({
             "type": "new_bid",
@@ -29,7 +27,6 @@ class AuctionConsumer(AsyncWebsocketConsumer):
         }))
     
     # BUY NOW
-    
     async def buy_now(self, event):
         await self.send(text_data=json.dumps({
             "type": "buy_now",
@@ -38,4 +35,15 @@ class AuctionConsumer(AsyncWebsocketConsumer):
                 "amount_display": event["amount_display"],
                 "offer_time": event["offer_time"],
             }
+        }))
+
+    # AUCTION STATUS UPDATE
+    async def auction_status_update(self, event):
+        """
+        Handles auction status changes (OPEN or CLOSED) broadcasted via Celery tasks.
+        """
+        await self.send(text_data=json.dumps({
+            "type": "auction_status_update",
+            "auction_id": event["auction_id"],
+            "status": event["status"],
         }))

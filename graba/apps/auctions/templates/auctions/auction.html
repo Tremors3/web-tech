@@ -73,7 +73,7 @@
                         </div>
                         <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
                             <h5 class="mb-2"><i class="bi bi-clock"></i> {{ auction.ftime_tag }}</h5>
-                            <p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>
+                            {% if object.ftime_left %}<p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>{% endif %}
                         </div>
                     </div>
 
@@ -555,7 +555,31 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Auction bought by ${data.buy_now.username} for €${data.buy_now.amount_display}`);
             window.location.reload();
         }
+
+        if (data.type === "auction_status_update") {
+            const status = data.status;
+            
+            // Aggiorna il testo dello stato nell'interfaccia
+            const statusElements = document.querySelectorAll('.card h5 + p.mb-0'); // puoi adattare il selettore al tuo template
+            statusElements.forEach(el => {
+                if (el.previousElementSibling && el.previousElementSibling.textContent.includes('Status')) {
+                    el.textContent = status;
+                }
+            });
+
+            // Se l'asta è chiusa, ricarica la pagina per mostrare il vincitore
+            if (status === "CLOSED") {
+                window.location.reload();
+            }
+
+            // Se l'asta è appena aperta, puoi eventualmente mostrare la sezione di bidding
+            if (status === "OPEN") {
+                show(bidListSection);
+                show(buyNowSection);
+            }
+        }
     };
+
 
 });
 </script>

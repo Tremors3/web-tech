@@ -49,6 +49,8 @@ class Auction(models.Model):
     seller = models.ForeignKey('accounts.Seller', on_delete=models.CASCADE)
     category = models.ForeignKey('auctions.Category', null=True, on_delete=models.SET_NULL)
 
+    # === METHODS AND PROPERTIES ===
+
     @property
     def has_offers(self, type_:str='BID') -> bool:
         return Offer.objects.filter(auction=self, type=type_).exists()
@@ -100,13 +102,18 @@ class Auction(models.Model):
         # Show at most two units
         return " ".join(parts[:2])
 
+    # === CELERY TASK ===
+
     def close(self):
+        """
+        Auction closing procedure. Called by Celery scheduled task.
+        """
         if self.status != "OPEN":
             return
 
         highest_bid = (
-            self.offers
-            .filter(type="BID")
+            Offer.objects
+            .filter(auction=self, type="BID")
             .order_by("-amount_cents")
             .first()
         )
@@ -119,7 +126,6 @@ class Auction(models.Model):
         
         # Close auction
         self.status = "CLOSED"
-        #self.closed_at = timezone.now()
         self.save(update_fields=["status"])
 
     def __str__(self):
