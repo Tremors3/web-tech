@@ -1,0 +1,66 @@
+INTRO
+
+Creare un sistema di aste online ispirato a Ebay, pensato per venditori e acquirenti.
+
+UTENZE
+
+1. Guest:
+    Non ha bisogno di registrarsi e puo' navigare sulla piattaforma con alcune limitazioni. Puo' usare la barra di ricerca per trovare aste e visualizzarle, ma non ha accesso ai servizi riservati agli utenti registrati.
+
+2. Utente:
+    Chi vuole partecipare o creare aste deve registrarsi creando un profilo. A seconda del tipo di utente (privato o negoziante), la registrazione richiedera' dati diversi. Dopo la registrazione, l'utente non puo' ancora partecipare o creare aste: per farlo, deve attivare la modalita' acquirente o venditore.
+
+3. Utente Acquirente:
+    Dopo essersi registrato, un utente puo' attivare la modalita' acquirente dal proprio profilo. Questa attivazione potrebbe richiedere l'inserimento di informazioni aggiuntive (come l'indirizzo di spedizione, il metodo di pagamento, ecc.). Una volta attivata, potra' partecipare alle aste.
+
+4. Utente Venditore:
+    Dopo essersi registrato, un utente puo' attivare la modalita' venditore dal proprio profilo. Anche in questo caso, l'attivazione potrebbe richiedere l'inserimento di dati aggiuntivi (come l'indirizzo di spedizione). Una volta attivata, potra' creare e gestire aste.
+
+BARRA DI RICERCA
+
+Nella pagina principale e' presente una barra di ricerca testuale (basata su Full-Text Search), accessibile a tutti gli utenti. Questa barra permette di cercare tra le aste in modo mirato, specificando uno o più campi come Titolo, Descrizione o Scheda tecnica. In alternativa, e' possibile eseguire una ricerca generale che prende in considerazione tutti i campi contemporaneamente. Accanto alla barra di ricerca sono disponibili filtri per raffinare i risultati, ad esempio per Categoria, Stato dell'oggetto, Fascia di prezzo, ecc.
+
+LISTE DI CONSIGLIATI
+
+1. PREFERITI:
+    Gli utenti acquirenti possono aggiungere un'asta alla lista dei preferiti. Queste aste verranno mostrate nella pagina principale, così da poterle ritrovare facilmente e accedervi rapidamente. Gli utenti possono anche rimuovere manualmente un'asta dai preferiti. In generale, le aste che non hanno più senso restare in lista (ad esempio perché sono state vinte da un altro acquirente) verranno rimosse automaticamente.
+
+2. VISTI DI RECENTE:
+    Questa lista viene gestita automaticamente dal sistema. Ogni volta che un utente acquirente visualizza un'asta, questa viene aggiunta alla lista dei visti di recente, se non e' gia' presente. L'utente puo' rimuovere manualmente un'asta da questa lista, ma non puo' aggiungerne una a mano.
+
+3. ALTRE LISTE:
+    Verra' implementata almeno un'altra lista a scelta dello studente. Alcuni esempi possibili sono:
+    - SIMILI AD ALTRI: mentre si visualizza una certa asta, vengono suggerite aste simili a quella in esame;
+    - STESSO VENDITORE: mentre si visualizza una certa asta, vengono suggerite altre aste dello stesso venditore;
+    - ecc.
+
+TIPOLOGIE DI OFFERTE/PROPOSTE
+
+1. OFFERTA:
+    L'utente acquirente puo' fare un'offerta su un'asta creata da un venditore, con l'obiettivo di aggiudicarsi l'oggetto. La prima offerta deve essere superiore al prezzo minimo stabilito dal venditore. In generale, ogni nuova offerta deve superare quella attualmente più alta. Gli acquirenti avranno a disposizione una pagina dedicata per ogni asta, dove potranno vedere tutte le offerte e fare nuove proposte.
+
+2. PROPOSTA DIRETTA:
+    L'utente acquirente puo' inviare una proposta diretta al venditore per provare a chiudere l'asta in anticipo. Le proposte sono valide solo se non e' stata fatta alcuna offerta sull'asta. Appena viene effettuata un'offerta, tutte le proposte dirette diventano nulle. Il venditore puo' vedere tutte le proposte nella pagina dell'asta, e puo' accettarne una o rifiutarle. Se accetta una proposta, l'asta si chiude automaticamente e tutte le altre proposte vengono invalidate.
+
+3. ACQUISTO DIRETTO (MASSIMALE):
+    Il venditore puo', in modo opzionale, impostare un prezzo massimo durante la creazione dell'asta. Questo permette agli acquirenti di comprare subito l'oggetto al prezzo indicato, chiudendo immediatamente l'asta. Come per le proposte dirette, l'acquisto diretto e' disponibile solo finché non ci sono offerte sull'asta.
+
+Opzionale:
+- Puo' essere implementata anche la funzionalità di OFFERTA AUTOMATICA (auto-bid): l'acquirente imposta un prezzo massimo, e la piattaforma fara' offerte automatiche al posto suo fino a raggiungere quella cifra.
+
+INBOX NOTIFICHE
+
+Ogni utente registrato avra' a disposizione una inbox delle notifiche (real-time oppure page-load, a discrezione dello studente). Questo sistema permette all'utente di rimanere aggiornato sullo stato delle aste. Ogni volta che una parte della piattaforma deve comunicare qualcosa all'utente, lo fa tramite questa inbox. Le notifiche possono includere un link che porta direttamente alla risorsa interessata, insieme a un titolo e a un messaggio di testo.
+
+Opzionale:
+- È possibile permettere agli utenti di inviarsi messaggi tra loro attraverso l'inbox.
+
+RECENSIONI
+
+Un utente registrato come acquirente puo' lasciare una recensione a un utente registrato come venditore, ma solo se ha effettivamente vinto un'asta di quel venditore. L'acquirente puo' lasciare una sola recensione per ciascuna asta vinta. La recensione puo' essere inviata solo dopo che la transazione e' conclusa, ovvero quando l'acquirente conferma di aver ricevuto il pacco spedito dal venditore. Dopo questa conferma, l'applicazione chiedera' all'utente di inserire una recensione. La recensione puo' contenere un testo e un voto da 1 a 5.
+
+Aggiuntive:
+- La piattaforma web ha il compito di notificare attivamente l'utente nel momento in cui una o piu' aste listate tra i preferiti stanno per scadere.
+
+Opzionale:
+- Anche il venditore puo' lasciare una recensione all'acquirente che ha vinto l'asta. Le due recensioni, acquirente-venditore e venditore-acquirente, saranno collegate tra loro e potranno essere mostrate insieme.
