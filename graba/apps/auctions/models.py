@@ -100,6 +100,28 @@ class Auction(models.Model):
         # Show at most two units
         return " ".join(parts[:2])
 
+    def close(self):
+        if self.status != "OPEN":
+            return
+
+        highest_bid = (
+            self.offers
+            .filter(type="BID")
+            .order_by("-amount_cents")
+            .first()
+        )
+
+        if highest_bid:
+            WinnerOffer.objects.create(
+                auction=self,
+                offer=highest_bid
+            )
+        
+        # Close auction
+        self.status = "CLOSED"
+        #self.closed_at = timezone.now()
+        self.save(update_fields=["status"])
+
     def __str__(self):
         return self.title
 

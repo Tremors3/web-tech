@@ -79,6 +79,7 @@ EXTERNAL_APPS = [
     'daphne',
     'jazzmin',
     'django_extensions',
+    'django_celery_beat',
 ]
 
 INTERNAL_APPS = [
@@ -132,18 +133,6 @@ CHANNEL_LAYERS = {
     'default': {
         "BACKEND": 'channels.layers.InMemoryChannelLayer',
     },
-}
-
-
-# ======================================================== #
-# ============= External Application Settings ============ #
-# ======================================================== #
-
-JAZZMIN_SETTINGS = {
-    'site_header': 'Graboid Admin',
-    'site_brand': 'Graboid Admin Page',
-    'site_logo': 'base/images/favicon/favicon.ico',
-    'copyright': 'graba',
 }
 
 
@@ -240,7 +229,7 @@ else:
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Rome'
 
 USE_I18N = True
 
@@ -299,3 +288,26 @@ LOGIN_REDIRECT_URL = '/'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+
+# ======================================================== #
+# =================== Jazzmin Settings =================== #
+# ======================================================== #
+
+JAZZMIN_SETTINGS = {
+    'site_header': 'Graboid Admin',
+    'site_brand': 'Graboid Admin Page',
+    'site_logo': 'base/images/favicon/favicon.ico',
+    'copyright': 'graba',
+}
+
+
+# ======================================================== #
+# ==================== Celery Settings =================== #
+# ======================================================== #
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+

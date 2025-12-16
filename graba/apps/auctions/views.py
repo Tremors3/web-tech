@@ -6,6 +6,9 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import View
 
+from django_celery_beat.models import ClockedSchedule, PeriodicTask
+import json
+
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
@@ -34,13 +37,27 @@ class AuctionCreateView(SellerRequiredMixin, CreateView):
             seller_role = Role.objects.get(user=user, type="SELLER", state="ACTIVE")
             seller_obj = Seller.objects.get(role=seller_role)
         except (Role.DoesNotExist, Seller.DoesNotExist):
-            form.add_error(None, "Impossibile trovare il profilo Seller per questo utente.")
+            form.add_error(None, "Cannot find the Seller profile for this user.")
             return self.form_invalid(form)
 
         # Link the Auction to the Seller
         auction.seller = seller_obj
 
         auction.save()
+
+        # AUCTION CLOSURE SCHEDULING
+        clocked, _ = ClockedSchedule.objects.get_or_create(
+            clocked_time=auction.end_date
+        )
+
+        PeriodicTask.objects.create(
+            clocked=clocked,
+            one_off=True,
+            name=f"close_auction_{auction.pk}",
+            task="auctions.tasks.close_auction_task",
+            args=json.dumps([auction.pk]),
+        )
+
         return super().form_valid(form)
 
     def get_success_url(self):
