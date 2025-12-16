@@ -73,8 +73,10 @@
                         </div>
                         <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
                             <h5 class="mb-2"><i class="bi bi-clock"></i> {{ auction.ftime_tag }}</h5>
-                            {% if object.ftime_left %}
-                                <p class="mb-0 flex-grow-1">{{ object.ftime_left }}</p>
+                            {% if object.status == "SCHEDULED" or object.status == "OPEN" %}
+                                <p class="mb-0 flex-grow-1">
+                                    <span id="auction-timer">0h 0m 0s</span>
+                                </p>
                             {% endif %}
                         </div>
                     </div>
@@ -87,14 +89,16 @@
                         </div>
                         <div class="p-3 bg-light rounded shadow-sm d-flex flex-column flex-grow-1">
                             <h5 class="mb-2"><i class="bi bi-currency-euro"></i> Pricing</h5>
-                            {% if highest_bid %}
-                                <p id="highest-bid-badge" class="mb-0"><strong>Highest Offer:</strong> €{{ highest_bid|cents_to_price }}</p>
-                            {% else %}
-                                <p class="mb-0"><strong>Minimum Price:</strong> €{{ object.min_price_cents|cents_to_price }}</p>
-                                {% if object.buy_now_price_cents %}
-                                    <p class="mb-0"><strong>Buy Now Price:</strong> €{{ object.buy_now_price_cents|cents_to_price }}</p>
+                            <div id="highest-bid-tag">
+                                {% if highest_bid %}
+                                    <p class="mb-0"><strong>Highest Offer:</strong> €{{ highest_bid|cents_to_price }}</p>
+                                {% else %}
+                                    <p class="mb-0"><strong>Minimum Price:</strong> €{{ object.min_price_cents|cents_to_price }}</p>
+                                    {% if object.buy_now_price_cents %}
+                                        <p class="mb-0"><strong>Buy Now Price:</strong> €{{ object.buy_now_price_cents|cents_to_price }}</p>
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -352,6 +356,39 @@ document.addEventListener('DOMContentLoaded', () => {
         day: "2-digit", month: "short", year: "numeric"
     });
 
+    function startAuctionTimer(endTime) {
+        const timerEl = document.getElementById("auction-timer");
+        if (!timerEl) return;
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = new Date(endTime).getTime() - now;
+
+            if (distance <= 0) {
+                timerEl.textContent = "0h 0m 0s";
+                clearInterval(interval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const arr = [];
+            if (days) arr.push(`${days}d`);
+            if (hours) arr.push(`${hours}h`);
+            if (minutes) arr.push(`${minutes}m`);
+            if (seconds || arr.length === 0) arr.push(`${seconds}s`);
+
+            timerEl.textContent = arr.slice(0, Math.min(2, arr.length)).join(" ");
+        }
+
+        updateTimer(); // update immediately
+        const interval = setInterval(updateTimer, 1000);
+    }
+
+
     /* ============================================================
        AUCTION STATE
     ============================================================ */
@@ -359,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bidList = document.getElementById('bid-list');
     const highestBidBadge = document.getElementById('highest-bid-live-badge');
+    const highestBidTag = document.getElementById('highest-bid-tag');
     const bidListSection = document.getElementById('bid_list_section');
     const buyNowSection = document.getElementById('buy_now_section');
     const noBidsFoundTxt = document.getElementById('no-bids-found-text');
@@ -369,11 +407,14 @@ document.addEventListener('DOMContentLoaded', () => {
        AUCTION STATE DISPATCHER
     ============================================================ */
     const AuctionStates = {
-        SCHEDULED: () => { /* static UI or timer */ },
+        SCHEDULED: () => {
+            startAuctionTimer("{{ object.start_date|date:'c' }}");
+        },
         OPEN: () => {
             initBidForm();
             initBuyNowForm();
             updateBidListVisibility();
+            startAuctionTimer("{{ object.end_date|date:'c' }}");
         },
         CLOSED: () => { /* static UI only */ },
         CANCELLED: () => { /* static UI only */ },
@@ -484,6 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newAmount > currentHighest) {
             highestBidBadge.dataset.amount = newAmount;
             highestBidBadge.innerHTML = `<i class="bi bi-trophy me-1"></i> Highest: €${bid.amount_display}`;
+            highestBidTag.innerHTML = `<p class="mb-0"><strong>Highest Offer:</strong> €${bid.amount_display}</p>`;
         }
 
         updateBidListVisibility();

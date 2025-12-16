@@ -106,14 +106,10 @@ class Auction(models.Model):
         minutes, seconds = divmod(remainder, 60)
 
         parts = []
-        if days > 0:
-            parts.append(f"{days}d")
-        if hours > 0:
-            parts.append(f"{hours}h")
-        if minutes > 0:
-            parts.append(f"{minutes}m")
-        if not parts:
-            parts.append(f"{seconds}s")
+        if days > 0: parts.append(f"{days}d")
+        if hours > 0: parts.append(f"{hours}h")
+        if not parts: parts.append(f"{minutes}m")
+        #if not parts: parts.append(f"{seconds}s")
 
         # Show at most two units
         return " ".join(parts[:2])
