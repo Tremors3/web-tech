@@ -201,10 +201,12 @@
             <!-- RIGHT COLUMN: Winner Information -->
             <div class="d-flex flex-column gap-3 flex-grow-1 min-w-200px">
                 <div class="d-flex align-items-center justify-content-between">
+                    
                     <div class="d-flex align-items-center">
                         <strong class="me-3" style="width: 150px;">Username:</strong>
                         {{ winner_offer.offer.buyer.role.user.username }}
                     </div>
+
                     <a href="{% url 'accounts:profile' winner_offer.offer.buyer.role.user.id %}" 
                     class="d-flex align-items-center text-primary text-decoration-none">
                         <i class="bi bi-person-circle me-1"></i> Visit Profile
@@ -339,100 +341,99 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* Helpers */
-    function show(el) {
-        el?.classList.remove("d-none");
-    }
+    /* ============================================================
+       HELPERS
+    ============================================================ */
+    const show = el => el?.classList.remove("d-none");
+    const hide = el => el?.classList.add("d-none");
 
-    function hide(el) {
-        el?.classList.add("d-none");
-    }
+    const formatDate = dt => new Date(dt).toLocaleString("en-GB", {
+        hour: "2-digit", minute: "2-digit",
+        day: "2-digit", month: "short", year: "numeric"
+    });
 
     /* ============================================================
-       SAVE AUCTION STATUS
+       AUCTION STATE
     ============================================================ */
+    const AUCTION_STATE = "{{ object.status }}";
 
-    const auctionStatus = "{{ object.status }}";
-
-    /* ============================================================
-       SEND BID FORM WITH AJAX (NO PAGE RELOAD)
-    ============================================================ */
-    
+    const bidList = document.getElementById('bid-list');
+    const highestBidBadge = document.getElementById('highest-bid-live-badge');
+    const bidListSection = document.getElementById('bid_list_section');
+    const buyNowSection = document.getElementById('buy_now_section');
+    const noBidsFoundTxt = document.getElementById('no-bids-found-text');
     const aucAlert = document.getElementById('auction_error_list');
     const titleErr = document.getElementById('id_title_error');
-    const bidForm = document.getElementById('bid-form');
-    
-    if (auctionStatus == "OPEN" && bidForm) {
+
+    /* ============================================================
+       AUCTION STATE DISPATCHER
+    ============================================================ */
+    const AuctionStates = {
+        SCHEDULED: () => { /* static UI or timer */ },
+        OPEN: () => {
+            initBidForm();
+            initBuyNowForm();
+            updateBidListVisibility();
+        },
+        CLOSED: () => { /* static UI only */ },
+        CANCELLED: () => { /* static UI only */ },
+    };
+
+    if (AuctionStates[AUCTION_STATE]) {
+        AuctionStates[AUCTION_STATE]();
+    }
+
+    /* ============================================================
+       BID FORM
+    ============================================================ */
+    function initBidForm() {
+        const bidForm = document.getElementById('bid-form');
+        if (!bidForm) return;
+
         const bidInput = bidForm.querySelector('input[name="amount"]');
         const csrfToken = bidForm.querySelector('[name=csrfmiddlewaretoken]').value;
 
-        bidForm.addEventListener('submit', async function (e) {
+        bidForm.addEventListener('submit', async e => {
             e.preventDefault();
-
             const response = await fetch("{% url 'auctions:auction-bid' object.id %}", {
                 method: "POST",
-                headers: {
-                    "X-CSRFToken": csrfToken,
-                    "Accept": "application/json",
-                },
-                body: new URLSearchParams({
-                    amount: bidInput.value
-                })
+                headers: { "X-CSRFToken": csrfToken, "Accept": "application/json" },
+                body: new URLSearchParams({ amount: bidInput.value })
             });
-
             const data = await response.json();
 
-            // Always clear old error messages
             titleErr.innerHTML = "";
-
             if (!data.success) {
-                // Display error msg
                 show(aucAlert);
-                
                 const li = document.createElement("li");
                 li.textContent = data.error || "Unknown error occurred.";
                 titleErr.appendChild(li);
-
                 return;
             }
 
-            // Hide error Msgs and reset the input
             hide(aucAlert);
             bidInput.value = "";
-
-            // The actual update of the list happens via WebSocket
         });
     }
 
-
-
     /* ============================================================
-       SEND BUY-NOW FORM WITH AJAX (NO PAGE RELOAD)
+       BUY NOW FORM
     ============================================================ */
-    
-    const buyNowForm = document.getElementById("buy-now-form");
+    function initBuyNowForm() {
+        const buyNowForm = document.getElementById("buy-now-form");
+        if (!buyNowForm) return;
 
-    if (auctionStatus == "OPEN" && buyNowForm) {
-        const csrfToken_bn = buyNowForm.querySelector('[name=csrfmiddlewaretoken]').value;
-        
-        buyNowForm.addEventListener("submit", async (e) => {
+        const csrfToken = buyNowForm.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        buyNowForm.addEventListener("submit", async e => {
             e.preventDefault();
-
-            const response = await fetch(
-                "{% url 'auctions:auction-buy-now' object.id %}",
-                {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrfToken_bn,
-                        "Accept": "application/json",
-                    },
-                }
-            );
-
+            const response = await fetch("{% url 'auctions:auction-buy-now' object.id %}", {
+                method: "POST",
+                headers: { "X-CSRFToken": csrfToken, "Accept": "application/json" },
+            });
             const data = await response.json();
 
             titleErr.innerHTML = "";
-
             if (!data.success) {
                 show(aucAlert);
                 const li = document.createElement("li");
@@ -441,150 +442,68 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Reload page on Success
-            window.location.reload();
+            window.location.reload(); // reload on successful buy-now
         });
     }
 
-
     /* ============================================================
-       DOM ELEMENTS
+       BID LIST VISIBILITY
     ============================================================ */
-
-    const bidList = document.getElementById('bid-list');
-    const highestBidBadge = document.getElementById('highest-bid-live-badge');
-
-
-
-    /* ============================================================
-       UPDATE LIST VISIBILITY
-    ============================================================ */
-
-    const bidListSection = document.getElementById('bid_list_section');
-    const buyNowSection = document.getElementById('buy_now_section');
-    const noBidsFoundTxt = document.getElementById('no-bids-found-text');
-
     function updateBidListVisibility() {
-        if (auctionStatus == "OPEN") {
-            if (bidList.children.length === 0) {
-                hide(bidListSection);
-                hide(highestBidBadge);
-                show(noBidsFoundTxt);
-                show(buyNowSection);
-            } else {
-                show(bidListSection);
-                show(highestBidBadge);
-                hide(noBidsFoundTxt);
-                hide(buyNowSection);
-            }
+        if (AUCTION_STATE !== "OPEN") return;
+
+        if (bidList.children.length === 0) {
+            hide(bidListSection);
+            hide(highestBidBadge);
+            show(noBidsFoundTxt);
+            show(buyNowSection);
+        } else {
+            show(bidListSection);
+            show(highestBidBadge);
+            hide(noBidsFoundTxt);
+            hide(buyNowSection);
         }
     }
 
-    updateBidListVisibility();
-
-
-
-    /* ============================================================
-       ADD NEW BID TO DOM + UPDATE HIGHEST BID
-    ============================================================ */
-
     function addNewBid(bid) {
+        if (AUCTION_STATE !== "OPEN") return;
 
         const li = document.createElement('li');
         li.className = "list-group-item d-flex justify-content-between align-items-center";
-
         li.innerHTML = `
             <div>
                 <strong>${bid.username}</strong>
-                <small class="text-muted ms-2">
-                    ${formatDate(bid.offer_time)}
-                </small>
+                <small class="text-muted ms-2">${formatDate(bid.offer_time)}</small>
             </div>
-            <span class="fw-semibold">
-                €${bid.amount_display}
-            </span>
+            <span class="fw-semibold">€${bid.amount_display}</span>
         `;
-
-        // Insert at the top
         bidList.prepend(li);
 
-        // Update highest bid badge
         const currentHighest = parseFloat(highestBidBadge.dataset.amount);
         const newAmount = parseFloat(bid.amount_display);
-
         if (newAmount > currentHighest) {
             highestBidBadge.dataset.amount = newAmount;
-            highestBidBadge.innerHTML = `
-                <i class="bi bi-trophy me-1"></i>
-                Highest: €${bid.amount_display}
-            `;
+            highestBidBadge.innerHTML = `<i class="bi bi-trophy me-1"></i> Highest: €${bid.amount_display}`;
         }
 
-        // Shows the section if necessary
         updateBidListVisibility();
     }
 
-
-
-    /* ============================================================
-       OFFER_TIME → PRETTY FORMATTER
-    ============================================================ */
-
-    function formatDate(dt) {
-        const date = new Date(dt);
-        return date.toLocaleString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    }
-
-
-
     /* ============================================================
        WEBSOCKET CONNECTION
+       Reload page on auction status change
     ============================================================ */
-
     const auctionId = "{{ auction_id }}";
     const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-
-    const ws = new WebSocket(
-        wsProtocol + window.location.host + "/ws/auction/" + auctionId + "/"
-    );
+    const ws = new WebSocket(`${wsProtocol}${window.location.host}/ws/auction/${auctionId}/`);
 
     ws.onmessage = function(event) {
         const data = JSON.parse(event.data);
 
-        if (data.type === "new_bid" && data.new_bid) {
-            addNewBid(data.new_bid);
-        }
-
-        if (data.type === "buy_now") {
-            alert(`Auction bought by ${data.buy_now.username} for €${data.buy_now.amount_display}`);
-            window.location.reload();
-        }
-
-        if (data.type === "auction_status_update") {
-            const status = data.status;
-            
-            console.log("UPDATE ARRIVED!")
-
-            if (status === "OPEN") {
-                // Se l'asta è appena aperta
-                alert(`Auction has been opened`);
-            }
-
-            if (status === "CLOSED") {
-                // Se l'asta è chiusa
-                alert(`Auction has finished`);
-            }
-            
-            window.location.reload();
-        }
+        if (data.type === "new_bid" && data.new_bid) addNewBid(data.new_bid);
+        if (data.type === "buy_now") window.location.reload();
+        if (data.type === "auction_status_update") window.location.reload();
     };
-
 
 });
 </script>
