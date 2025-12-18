@@ -164,12 +164,13 @@ class UserProfileDetailView(TemplateView):
 
         if self.request.user.is_authenticated:
             try:
-                buyer = Buyer.objects.get(role__user=self.request.user)
+                buyer_instance = Buyer.objects.get(role__user=self.request.user)
 
                 winner_offers_qs = (
                     WinnerOffer.objects
                     .filter(
-                        offer__buyer=buyer,
+                        offer__buyer=buyer_instance,
+                        auction__seller=seller_instance,
                         auction__status="CLOSED"
                     )
                     .exclude(
