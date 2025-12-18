@@ -18,7 +18,7 @@
 
             <!-- Non Field Errors -->
             {% if form.non_field_errors %}
-                <div class="alert alert-danger list-icon list-icon-error">
+                <div class="alert alert-danger list-icon list-icon-error mb-0">
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 {% if form.username.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.username.errors }}
                     </div>
                 {% endif %}
@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 {% if form.password.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.password.errors }}
                     </div>
                 {% endif %}

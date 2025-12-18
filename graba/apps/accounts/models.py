@@ -2,6 +2,7 @@ from typing import Dict, Any
 
 from django.db import models
 from django.utils import timezone
+from django.db.models import Count, Avg
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import ( 
@@ -104,6 +105,13 @@ class Seller(models.Model):
     role = models.OneToOneField('accounts.Role', on_delete=models.CASCADE, primary_key=True, 
                                 limit_choices_to={'type': 'SELLER'})
     collection_address = models.TextField()
+    
+    @property
+    def rating_stats(self):
+        return self.reviews.aggregate(
+            count=Count('id'),
+            avg=Avg('rating')
+        )
 
     def __str__(self):
         return f"Seller {self.role.user.username}"

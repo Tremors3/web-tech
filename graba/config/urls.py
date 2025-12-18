@@ -31,11 +31,14 @@ urlpatterns = [
     # Accounts
     path('accounts/', include('accounts.urls', namespace='accounts')),
     
+    # Auctions
+    path('auctions/', include('auctions.urls', namespace='auctions')),
+    
     # Favorites
     path('favorites/', include('favorites.urls', namespace='favorites')),
     
-    # Auctions
-    path('auctions/', include('auctions.urls', namespace='auctions')),
+    # Reviews
+    path('reviews/', include('reviews.urls', namespace='reviews')),
 ]
 
 

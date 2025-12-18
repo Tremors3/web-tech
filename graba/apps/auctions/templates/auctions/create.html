@@ -20,7 +20,7 @@
 
             <!-- Non Field Errors -->
             {% if form.non_field_errors %}
-                <div class="alert alert-danger list-icon list-icon-error">
+                <div class="alert alert-danger list-icon list-icon-error mb-0">
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 {% if form.title.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.title.errors }}
                     </div>
                 {% endif %}
@@ -49,7 +49,7 @@
                     </div>
                 </div>
                 {% if form.image.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.image.errors }}
                     </div>
                 {% endif %}
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 {% if form.description.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.description.errors }}
                     </div>
                 {% endif %}
@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 {% if form.technical_details.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.technical_details.errors }}
                     </div>
                 {% endif %}
@@ -92,7 +92,7 @@
                     </div>
                 </div>
                 {% if form.start_date.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.start_date.errors }}
                     </div>
                 {% endif %}
@@ -104,7 +104,7 @@
                     </div>
                 </div>
                 {% if form.end_date.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.end_date.errors }}
                     </div>
                 {% endif %}
@@ -125,7 +125,7 @@
                     <span>cents</span>
                 </div>
                 {% if form.min_price_eur.errors or form.min_price_cents.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.min_price_eur.errors }}
                         {{ form.min_price_cents.errors }}
                     </div>
@@ -139,7 +139,7 @@
                     </div>
                 </div>
                 {% if form.enable_buy_now_price.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.enable_buy_now_price.errors }}
                     </div>
                 {% endif %}
@@ -154,7 +154,7 @@
                         <span>cents</span>
                     </div>
                     {% if form.buy_now_price_eur.errors or form.buy_now_price_cents.errors %}
-                        <div class="alert alert-danger list-icon list-icon-error">
+                        <div class="alert alert-danger list-icon list-icon-error mb-0">
                             {{ form.buy_now_price_eur.errors }}
                             {{ form.buy_now_price_cents.errors }}
                         </div>
@@ -175,7 +175,7 @@
                     </div>
                 </div>
                 {% if form.category.errors %}
-                    <div class="alert alert-danger list-icon list-icon-error">
+                    <div class="alert alert-danger list-icon list-icon-error mb-0">
                         {{ form.category.errors }}
                     </div>
                 {% endif %}

@@ -14,7 +14,8 @@ from .forms import UserRegistrationForm, CustomLoginForm, UserProfileForm
 from .models import User, Role, Buyer, Seller, Private, Shopkeeper
 from .mixins import RedirectAuthenticatedUserMixin
 
-from auctions.models import Auction
+from reviews.models import Review
+from auctions.models import Auction, WinnerOffer
 from favorites.models import FavoriteAuction
 
 
@@ -139,11 +140,51 @@ class UserProfileDetailView(TemplateView):
         if seller_instance:
             auc_list = Auction.objects.filter(seller=seller_instance)
         else:
-            auc_list = Auction.objects.none()   # Nessuna asta
+            auc_list = Auction.objects.none()
         auc_page = self.request.GET.get("auc_page", 1)
         
         auc_paginator = Paginator(auc_list, 3)
         context["auc_page_obj"] = auc_paginator.get_page(auc_page)
+
+
+        # REVIEWS
+        if seller_instance:
+            context['reviews'] = seller_instance.reviews.all()
+            rating_stats = seller_instance.rating_stats
+            context['reviews_count'] = rating_stats.get('count')
+            context['average_rating'] = float(rating_stats.get('avg') or 0)
+        else:
+            context['reviews'] = Review.objects.none()
+            context['reviews_count'] = None
+            context['average_rating'] = None
+
+
+        # REVIEWABLE AUCTIONS
+        context['reviewable_auctions'] = []
+
+        if self.request.user.is_authenticated:
+            try:
+                buyer = Buyer.objects.get(role__user=self.request.user)
+
+                winner_offers_qs = (
+                    WinnerOffer.objects
+                    .filter(
+                        offer__buyer=buyer,
+                        auction__status="CLOSED"
+                    )
+                    .exclude(
+                        review__isnull=False
+                    )
+                    .select_related('auction')
+                )
+
+                context['reviewable_auctions'] = [{
+                    "winner_offer_id": wo.pk,
+                    "auction_title": wo.auction.title
+                } for wo in winner_offers_qs]
+
+            except Buyer.DoesNotExist:
+                pass
 
 
         return context

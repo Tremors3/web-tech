@@ -103,11 +103,303 @@
 
 
     <!-- FOURTH SECTION: Vendor Reviews -->
-    <div class="card bg-white rounded shadow pt-4 px-4 w-100">
-        <h2 class="text-center">Reviews</h2>
+    <div class="card bg-white rounded shadow py-4 px-4 w-100">
+        
+        <div class="d-flex flex-column">
+
+            <!-- Title and Average Rating section -->
+            <div class="d-flex align-items-center justify-content-between">
+                <h2 class="mb-0">Reviews</h2>
+
+                <div id="average_rating_badge">
+                    {% if average_rating %}
+                        <span class="fs-4 fw-bold">
+                            ⭐ {{ average_rating|floatformat:1 }} / 5
+                        </span>
+                        <span class="text-muted">
+                            ({{ reviews.count }} reviews)
+                        </span>
+                    {% else %}
+                        <span class="text-muted">No reviews yet</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Reviews list section -->
+            <ul id="reviews-list" class="list-unstyled d-flex flex-column mt-3 mb-0 gap-3 d-none">
+
+                {% for review in reviews %}
+                    <li class="d-flex flex-column border rounded p-3 gap-2">
+
+                        <!-- Rating + Buyer + Auction -->
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <strong>⭐ {{ review.rating }} / 5</strong> -
+
+                                <a href="{% url 'accounts:profile' review.winner_offer.offer.buyer.role.user.pk %}" class="text-decoration-none">
+                                    {{ review.winner_offer.offer.buyer.role.user.username }}
+                                </a>
+                            </div>
+
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <a href="{% url 'auctions:auction-detail' review.winner_offer.offer.auction.pk %}" 
+                                class="text-decoration-none text-truncate" 
+                                style="max-width: 200px;" 
+                                title="{{ review.winner_offer.offer.auction.title }}">
+                                    {{ review.winner_offer.offer.auction.title }}
+                                </a>
+
+                                <span class="text-muted small">
+                                    {{ review.review_date|date:"d M Y" }}
+                                </span>
+                            </div>
+
+                        </div>
+
+                        {% if review.review_text %}
+                            <p class="mb-0">{{ review.review_text }}</p>
+                        {% endif %}
+
+                    </li>
+                {% endfor %}
+
+            </ul>
+
+            <!-- New Review section -->
+            {% if request.user.is_authenticated and reviewable_auctions %}
+                <div id="leave-review-section">
+                    <hr>
+                
+                    <form method="POST" id="leave-review-form" class="d-flex flex-column gap-3">
+                    {% csrf_token %}
+                        
+                        <!-- Title and Average Rating -->
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h5>Leave a Review</h5>
+
+                            <!-- Submit -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-sm btn-outline-primary px-4">
+                                    Submit Review
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Auction -->
+                        <div class="d-flex align-items-center">
+                            <strong class="me-3" style="width: 150px;">
+                                Auction:
+                            </strong>
+                            <select id="auction-select" name="winner_offer_id" class="form-select" required>
+                                <option value="" selected disabled>
+                                    Select an auction
+                                </option>
+                                {% for a in reviewable_auctions %}
+                                    <option value="{{ a.winner_offer_id }}">
+                                        {{ a.auction_title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="d-flex align-items-center">
+                            <strong class="me-3" style="width: 150px;">
+                                Rating:
+                            </strong>
+                            <select id="rating" name="rating" class="form-select" required>
+                                <option value="" selected disabled>
+                                    Select rating
+                                </option>
+                                {% for i in "12345" %}
+                                    <option value="{{ i }}">{{ i }} ⭐</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Review text -->
+                        <div class="d-flex align-items-start">
+                            <strong class="me-3 pt-1" style="width: 150px;">
+                                Comment:
+                            </strong>
+                            <textarea id="review_text" name="review_text" class="form-control" rows="3" placeholder="Write your review..."></textarea>
+                        </div>
+
+                        <!-- Review error list -->
+                        <div id="review_error_list" class="alert alert-danger list-icon list-icon-error mb-0 d-none">
+                            <ul class="errorlist" id="id_title_error"></ul>
+                        </div>
+
+                    </form>
+                </div>
+            {% endif %}
+
+        </div>
     </div>
 
 </div>
 {% endblock %}
 
-{% block extra_js %}{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ============================================================
+       HELPERS
+    ============================================================ */
+    const show = el => el?.classList.remove("d-none");
+    const hide = el => el?.classList.add("d-none");
+
+    /* ============================================================
+       REVIEW STATE
+    ============================================================ */
+    const revList = document.getElementById('reviews-list');
+    const revAlert = document.getElementById('review_error_list');
+    const titleErr = document.getElementById('id_title_error');
+
+    initReviewForm();
+    updateReviewListVisibility();
+
+    /* ============================================================
+       REVIEW FORM
+    ============================================================ */
+    function initReviewForm() {
+        const sect = document.getElementById("leave-review-section");
+        const form = document.getElementById("leave-review-form");
+        if (!form) return;
+
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            fetch("{% url 'reviews:leave_review' %}", {
+                method: "POST",
+                headers: {"X-CSRFToken": csrfToken, "Accept": "application/json" },
+                body: formData,
+            })
+            .then(response => response.json().then(data => ({
+                status: response.status,
+                body: data
+            })))
+            .then(({ status, body }) => {
+
+                titleErr.innerHTML = "";
+                if (status !== 200) {
+                    show(revAlert);
+                    const li = document.createElement("li");
+                    li.textContent = body.error || "Unknown error occurred.";
+                    titleErr.appendChild(li);
+                    return;
+                }
+
+                // Hide Alert Panel
+                hide(revAlert);
+
+                // Remove reviewed auction from dropdown
+                const auctionSelect = document.getElementById("auction-select");
+                const selectedOption = auctionSelect.options[auctionSelect.selectedIndex];
+                selectedOption.remove();
+
+                // Reset form
+                form.reset();
+
+                // Hide form if no more reviewable auctions
+                if (auctionSelect.options.length === 1) {
+                    hide(sect);
+                }
+
+                // Add Review to the List
+                addReviewToList(body.review);
+                
+                // Update the badge showing the rating
+                updateAvgRatingBadge(body.total_rating);
+
+                // Show Review List
+                updateReviewListVisibility();
+
+            })
+            .catch(() => {
+                show(revAlert);
+                const li = document.createElement("li");
+                li.textContent = "Network error.";
+                titleErr.appendChild(li);
+            });
+        });
+    }
+
+    /* ============================================================
+       UPDATE VISIBILIRY OF HTML COMPONENTS
+    ============================================================ */
+
+    /* Update Review List Visibility */
+    function updateReviewListVisibility() {
+        if (revList.children.length === 0) {
+            hide(revList);
+        } else {
+            show(revList);
+        }
+    }
+
+    /* Adding a new Review to the Review List */
+    function addReviewToList(review) {
+        const li = document.createElement('li');
+
+        li.className = "d-flex flex-column border rounded p-3 gap-2";
+        li.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <strong>⭐ ${ review.rating } / 5</strong> -
+                    <a href="${ review.user.url }" class="text-decoration-none">${ review.user.username }</a>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <a href="${ review.auction.url }" 
+                    class="text-decoration-none text-truncate" 
+                    style="max-width: 200px;" 
+                    title="${ review.auction.title }">
+                        ${ review.auction.title }
+                    </a>
+                    <span class="text-muted small">${ review.date }</span>
+                </div>
+
+            </div>
+        `;
+
+        if (review.text) {
+            const p = document.createElement("p");
+            p.className = "mb-0";
+            p.textContent = review.text;
+            li.appendChild(p);
+        }
+
+        revList.prepend(li);
+    }
+
+    /* Update the seller Rating Badge */
+    function updateAvgRatingBadge(total_rating) {
+        const badge = document.getElementById("average_rating_badge");
+
+        if (total_rating) {
+            badge.innerHTML = `
+                <span class="fs-4 fw-bold">
+                    ⭐ ${ Number(total_rating.average_rating.toFixed(1)) } / 5
+                </span>
+                <span class="text-muted">
+                    (${ total_rating.reviews_count } reviews)
+                </span>
+            `;
+        } else {
+            badge.innerHTML = `
+                <span class="text-muted">No reviews yet</span>
+            `;
+        }
+    }
+
+});
+</script>
+{% endblock %}
