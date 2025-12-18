@@ -6,12 +6,12 @@ from .models import Auction
 
 class AuctionForm(forms.ModelForm):
     # Min price fields
-    min_price_eur = forms.IntegerField(min_value=0, initial=0, widget=forms.NumberInput(attrs={"style": "width: 164px;"}))
-    min_price_cents = forms.IntegerField(min_value=0, max_value=99, initial=1)
+    min_price_eur = forms.IntegerField(min_value=0, initial=0, widget=forms.NumberInput(attrs={"style": "width: 120px;"}))
+    min_price_cents = forms.IntegerField(min_value=0, max_value=99, initial=0)
     
     # Buy now price fields
-    buy_now_price_eur = forms.IntegerField(min_value=0, initial=0, widget=forms.NumberInput(attrs={"style": "width: 164px;"}))
-    buy_now_price_cents = forms.IntegerField(min_value=0, max_value=99, initial=1)
+    buy_now_price_eur = forms.IntegerField(min_value=0, initial=0, widget=forms.NumberInput(attrs={"style": "width: 120px;"}))
+    buy_now_price_cents = forms.IntegerField(min_value=0, max_value=99, initial=0)
     
     # Buy now price enable checbox
     enable_buy_now_price = forms.BooleanField(required=False, widget=forms.CheckboxInput())
@@ -79,6 +79,9 @@ class AuctionForm(forms.ModelForm):
 
         if min_price <= 0:
             self.add_error("min_price_cents", "Minimum price must be greater than zero.")
+
+        if buy_now <= 0:
+            self.add_error("buy_now_price_cents", "Buy Now price must be greater than zero.")
 
         if buy_now is not None and buy_now < min_price:
             self.add_error(

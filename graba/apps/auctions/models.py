@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
 
+from datetime import timedelta
+
 from .scripts.misc import auction_image_upload_to
 
 class Category(models.Model):
@@ -41,7 +43,7 @@ class Auction(models.Model):
     description = models.TextField(blank=True, null=True)
     technical_details = models.TextField(blank=True, null=True)
     start_date = models.DateTimeField(default=timezone.now)
-    end_date = models.DateTimeField()
+    end_date = models.DateTimeField(default=lambda: timezone.now() + timedelta(days=7))
     min_price_cents = models.IntegerField()
     buy_now_price_cents = models.IntegerField(blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='SCHEDULED')
